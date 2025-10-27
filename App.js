@@ -48,7 +48,7 @@ const accounts = [
     id: 2,
     name: "Heisenberg",
     accountNumber: "4412 1234 7890 6753",
-    bankName: "HDFC Bank",
+    bankName: "Standard Chartered",
     transactions: [
       {
         date: "2025-10-07",
@@ -88,46 +88,6 @@ const accounts = [
     id: 3,
     name: "Elon Musk",
     accountNumber: "4412 1234 7890 6753",
-    bankName: "ICICI Bank",
-    transactions: [
-      {
-        date: "2025-10-07",
-        id: "TNX005298076301",
-        description: "Managerial Batch salary",
-        amount: 113800,
-        approver: "Jane Margolis"
-      },
-      {
-        date: "2025-10-11",
-        id: "TNX0098765432",
-        description: "Operations Batch salary",
-        amount: 14000,
-        approver: "Jesse Pinkman"
-      },
-      {
-        date: "2025-10-13",
-        id: "TNX003591878654",
-        description: "Executives Salary",
-        amount: 768636000,
-        approver: "Mr.White"
-      },
-      {
-        date: "2025-10-16",
-        id: "TNX008922875820",
-        description: "Miscellaneous",
-        amount: 42504000,
-        approver: "Skyler"
-      }
-    ],
-    balance: 97851.32,
-    opening: 41000,
-    closing: 168800,
-    currency: "USD"
-  },
-  {
-    id: 1,
-    name: "Alex Kumar",
-    accountNumber: "4412 1234 7890 6753",
     bankName: "Standard Chartered",
     transactions: [
       {
@@ -164,11 +124,51 @@ const accounts = [
     closing: 168800,
     currency: "USD"
   },
+  {
+    id: 4,
+    name: "Alex Kumar",
+    accountNumber: "4412 1234 7890 6753",
+    bankName: "Standard Chartered",
+    transactions: [
+      {
+        date: "2025-10-07",
+        id: "TNX005298076301",
+        description: "Managerial Batch salary",
+        amount: 25000,
+        approver: "Jane Margolis"
+      },
+      {
+        date: "2025-10-11",
+        id: "TNX0098765432",
+        description: "Operations Batch salary",
+        amount: 20000,
+        approver: "Jesse Pinkman"
+      },
+      {
+        date: "2025-10-13",
+        id: "TNX003591878654",
+        description: "Executives Salary",
+        amount: 15000,
+        approver: "Mr.White"
+      },
+      {
+        date: "2025-08-16",
+        id: "TNX008922875820",
+        description: "Miscellaneous",
+        amount: 10000,
+        approver: "Skyler"
+      }
+    ],
+    balance: 100000.00,
+    opening: 41000,
+    closing: 168800,
+    currency: "USD"
+  },
 ];
 
 export default function App() {
   const [selectedAccount, setSelectedAccount] = useState(null);
-  const [currency, setCurrency] = useState("USD");
+  const [currency, setCurrency] = useState("INR");
 
   if (!selectedAccount) {
     return <LandingPage profiles={accounts} onSelectProfile={acc => { setSelectedAccount(acc); setCurrency(acc.currency); }} />;
@@ -186,8 +186,7 @@ export default function App() {
       />
       <TransactionHistory
         transactions={selectedAccount.transactions}
-        openingBalance={selectedAccount.opening}
-        closingBalance={selectedAccount.closing}
+        accountBalance={selectedAccount.balance}
         currency={currency}
       />
     </div>
