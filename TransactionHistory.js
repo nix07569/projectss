@@ -2,17 +2,60 @@
 import React, { useState } from "react";
 import "./TransactionHistory.css";
 
-export default function TransactionHistory({
-  transactions, openingBalance, closingBalance, currency
+const currencies = [
+  { code: "INR", symbol: "₹" },
+  { code: "USD", symbol: "$" },
+];
+
+const exchangeRates = {
+  INR: 88,
+  USD: 1,
+};
+
+function convertBalance(balance, target) {
+  return (balance * exchangeRates[target]).toLocaleString(undefined, {
+    minimumFractionDigits: 2,
+  });
+}
+
+function TransactionHistory({ 
+  transactions = [], 
+  currency = "USD",
+  accountBalance = 0 
 }) {
   const [filter, setFilter] = useState({ start: "", end: "" });
 
-  const filteredTxns = transactions.filter(txn => {
+  // Get default date range (one month ago to today)
+  const getDefaultDateRange = () => {
+    const today = new Date();
+    const oneMonthAgo = new Date();
+    oneMonthAgo.setMonth(today.getMonth() - 1);
+    return { start: oneMonthAgo, end: today };
+  };
+
+  // Filter transactions by date range
+  const filtered = transactions.filter((txn) => {
     const txnDate = new Date(txn.date);
-    const startDate = filter.start ? new Date(filter.start) : null;
-    const endDate = filter.end ? new Date(filter.end) : null;
-    return (!startDate || txnDate >= startDate) && (!endDate || txnDate <= endDate);
+    const defaultRange = getDefaultDateRange();
+    const startDate = filter.start ? new Date(filter.start) : defaultRange.start;
+    const endDate = filter.end ? new Date(filter.end) : defaultRange.end;
+    return txnDate >= startDate && txnDate <= endDate;
   });
+
+  // Sort by newest on top
+  const sortedTransactions = [...filtered].sort(
+    (a, b) => new Date(b.date) - new Date(a.date)
+  );
+
+  // Calculate balances
+  const transactionTotal = sortedTransactions.reduce((sum, txn) => sum + txn.amount, 0);
+  const closingBalance = accountBalance;
+  const openingBalance = closingBalance + transactionTotal;
+
+  // Get currency symbol
+  const getCurrencySymbol = (code) => {
+    return currencies.find((c) => c.code === code)?.symbol || "$";
+  };
 
   return (
     <div className="txn-root">
@@ -23,7 +66,7 @@ export default function TransactionHistory({
             <input
               type="date"
               value={filter.start}
-              onChange={e => setFilter({ ...filter, start: e.target.value })}
+              onChange={(e) => setFilter({ ...filter, start: e.target.value })}
             />
           </label>
           <label>
@@ -31,18 +74,35 @@ export default function TransactionHistory({
             <input
               type="date"
               value={filter.end}
-              onChange={e => setFilter({ ...filter, end: e.target.value })}
+              onChange={(e) => setFilter({ ...filter, end: e.target.value })}
             />
           </label>
         </div>
         <div className="txn-actions">
-          <button className="clear-btn" onClick={() => setFilter({ start: "", end: "" })}>Clear</button>
-          <button className="download-btn">Download PDF</button>
+          <button
+            className="clear-btn"
+            onClick={() => setFilter({ start: "", end: "" })}
+          >
+            Clear
+          </button>
+          <button className="download-btn">Download</button>
         </div>
       </div>
       <div className="txn-balances-row">
-        <span>Opening Balance: <strong>{currency === "USD" ? "$" : "₹"}{openingBalance.toLocaleString(undefined, {minimumFractionDigits:2})}</strong></span>
-        <span>Closing Balance: <strong>{currency === "USD" ? "$" : "₹"}{closingBalance.toLocaleString(undefined, {minimumFractionDigits:2})}</strong></span>
+        <span className="openingBalance">
+          Opening Balance:{" "}
+          <strong>
+            {getCurrencySymbol(currency)}
+            {convertBalance(openingBalance, currency)}
+          </strong>
+        </span>
+        <span className="closingBalance">
+          Closing Balance:{" "}
+          <strong>
+            {getCurrencySymbol(currency)}
+            {convertBalance(closingBalance, currency)}
+          </strong>
+        </span>
       </div>
       <table className="txn-table">
         <thead>
@@ -55,12 +115,17 @@ export default function TransactionHistory({
           </tr>
         </thead>
         <tbody>
-          {filteredTxns.map((txn, i) => (
+          {sortedTransactions.map((txn, i) => (
             <tr key={txn.id || i}>
               <td>{txn.date}</td>
               <td>{txn.id}</td>
               <td>{txn.description}</td>
-              <td>{currency === "USD" ? "$" : "₹"}{txn.amount.toLocaleString(undefined, {minimumFractionDigits: 2})}</td>
+              <td>
+                {getCurrencySymbol(txn.currency)}{" "}
+                {txn.amount.toLocaleString(undefined, {
+                  minimumFractionDigits: 2,
+                })}
+              </td>
               <td>{txn.approver}</td>
             </tr>
           ))}
@@ -69,3 +134,5 @@ export default function TransactionHistory({
     </div>
   );
 }
+
+export default TransactionHistory;
