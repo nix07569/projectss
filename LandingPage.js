@@ -12,8 +12,6 @@ export default function LandingPage({ profiles, onSelectProfile }) {
             key={profile.id}
             className="profile-card"
             onClick={() => onSelectProfile(profile)}
-            tabIndex={0}
-            aria-label={`Select ${profile.name}`}
           >
             <div className="profile-name">{profile.name}</div>
             <div className="profile-accnum">{profile.accountNumber}</div>
