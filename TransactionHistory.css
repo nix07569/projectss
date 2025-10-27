@@ -51,6 +51,7 @@
   color: #2563eb;
   border: 1px solid #bee5fa;
   font-size: 1.1rem;
+  letter-spacing: 1px;
   padding: 0 30px;
   margin-right: 160px;
   border-radius: 8px;
@@ -61,10 +62,11 @@
   background: #d7effe;
 }
 .download-btn {
-  background: #2563eb;
+  background: #0473EA;
   color: #fff;
-  font-weight: 500;
+  font-weight: 550;
   border: none;
+  letter-spacing: 1.5px;
   font-size: 1.1rem;
   padding: 12px 30px;
   border-radius: 8px;
@@ -72,14 +74,15 @@
   cursor: pointer;
 }
 .download-btn:hover {
-  background: #1749ae;
+  background: #133d92;
 }
 .txn-balances-row {
-  display: flex;
-  justify-content: flex-end;
-  gap: 80px;
-  margin: 18px 0 12px 0;
+  display: flex;  
+  margin: 18px 0 15px 0;
+  gap: 480px;
 }
+
+
 .txn-balances-row span {
   background: #f7faff;
   border-radius: 13px;
