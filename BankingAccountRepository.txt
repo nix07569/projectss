@@ -1,7 +1,6 @@
-package com.example.bankingapp.repository;
+package com.finapp.backend.repository;
 
+import com.finapp.backend.entity.Account;
 import org.springframework.data.jpa.repository.JpaRepository;
-import com.example.bankingapp.model.BankAccount;
 
-public interface BankAccountRepository extends JpaRepository<BankAccount, Long> {
-}
+public interface AccountRepository extends JpaRepository<Account, Long> { }
