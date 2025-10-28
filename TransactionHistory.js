@@ -1,4 +1,3 @@
-// TransactionHistory.js
 import React, { useState } from "react";
 import "./TransactionHistory.css";
 
@@ -13,19 +12,25 @@ const exchangeRates = {
 };
 
 function convertBalance(balance, target) {
-  return (balance * exchangeRates[target]).toLocaleString(undefined, {
+  return (balance * (exchangeRates[target] || 1)).toLocaleString(undefined, {
     minimumFractionDigits: 2,
   });
 }
 
-function TransactionHistory({ 
-  transactions = [], 
+function TransactionHistory({
+  transactions = [],
   currency = "USD",
-  accountBalance = 0 
+  accountBalance = 0,
 }) {
   const [filter, setFilter] = useState({ start: "", end: "" });
 
-  // Get default date range (one month ago to today)
+  // Extract initial balance from transactions or fallback to 0
+  const initialBalance =
+    transactions.length > 0 && transactions[0].initialBalance !== undefined
+      ? transactions[0].initialBalance
+      : 0;
+
+  // Default date range - one month ago to today
   const getDefaultDateRange = () => {
     const today = new Date();
     const oneMonthAgo = new Date();
@@ -35,6 +40,10 @@ function TransactionHistory({
 
   // Filter transactions by date range
   const filtered = transactions.filter((txn) => {
+    if (txn.initialBalance !== undefined) {
+      // Exclude initialBalance object from transactions list
+      return false;
+    }
     const txnDate = new Date(txn.date);
     const defaultRange = getDefaultDateRange();
     const startDate = filter.start ? new Date(filter.start) : defaultRange.start;
@@ -47,12 +56,30 @@ function TransactionHistory({
     (a, b) => new Date(b.date) - new Date(a.date)
   );
 
-  // Calculate balances
-  const transactionTotal = sortedTransactions.reduce((sum, txn) => sum + txn.amount, 0);
-  const closingBalance = accountBalance;
-  const openingBalance = closingBalance + transactionTotal;
+  // Calculate opening balance at start of filter range
+  const openingBalance = (() => {
+    const defaultRange = getDefaultDateRange();
+    const startDate = filter.start ? new Date(filter.start) : defaultRange.start;
 
-  // Get currency symbol
+    // Sum of all transactions before startDate
+    const totalBeforeStart = transactions
+      .filter((txn) => {
+        if (txn.initialBalance !== undefined) return false;
+        return new Date(txn.date) < startDate;
+      })
+      .reduce((sum, txn) => sum + txn.amount, 0);
+
+    // Opening balance = initialBalance + sum of transactions before start date
+    return initialBalance + totalBeforeStart;
+  })();
+
+  // Sum of transactions within date range
+  const transactionTotal = sortedTransactions.reduce((sum, txn) => sum + txn.amount, 0);
+
+  // Closing balance = opening + transactions in range
+  const closingBalance = openingBalance - transactionTotal;
+
+  // Get currency symbol helper
   const getCurrencySymbol = (code) => {
     return currencies.find((c) => c.code === code)?.symbol || "$";
   };
@@ -79,10 +106,7 @@ function TransactionHistory({
           </label>
         </div>
         <div className="txn-actions">
-          <button
-            className="clear-btn"
-            onClick={() => setFilter({ start: "", end: "" })}
-          >
+          <button className="clear-btn" onClick={() => setFilter({ start: "", end: "" })}>
             Clear
           </button>
           <button className="download-btn">Download</button>
