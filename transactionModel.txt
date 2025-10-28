@@ -1,45 +1,79 @@
-package com.example.bankingapp.model;
+package com.finapp.backend.entity;
 
-import jakarta.persistence.*;
+import javax.persistence.*;
 import java.time.LocalDate;
 
 @Entity
-@Table(name = "transactions")
 public class Transaction {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private LocalDate date;
-    private String transactionId;
     private String description;
     private Double amount;
     private String approver;
+    private String currency;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "account_id")
-    private BankAccount bankAccount;
+    private Account account;
 
     // Getters and Setters
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
 
-    public LocalDate getDate() { return date; }
-    public void setDate(LocalDate date) { this.date = date; }
+    public Long getId() {
+        return id;
+    }
 
-    public String getTransactionId() { return transactionId; }
-    public void setTransactionId(String transactionId) { this.transactionId = transactionId; }
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-    public String getDescription() { return description; }
-    public void setDescription(String description) { this.description = description; }
+    public LocalDate getDate() {
+        return date;
+    }
 
-    public Double getAmount() { return amount; }
-    public void setAmount(Double amount) { this.amount = amount; }
+    public void setDate(LocalDate date) {
+        this.date = date;
+    }
 
-    public String getApprover() { return approver; }
-    public void setApprover(String approver) { this.approver = approver; }
+    public String getDescription() {
+        return description;
+    }
 
-    public BankAccount getBankAccount() { return bankAccount; }
-    public void setBankAccount(BankAccount bankAccount) { this.bankAccount = bankAccount; }
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public Double getAmount() {
+        return amount;
+    }
+
+    public void setAmount(Double amount) {
+        this.amount = amount;
+    }
+
+    public String getApprover() {
+        return approver;
+    }
+
+    public void setApprover(String approver) {
+        this.approver = approver;
+    }
+
+    public String getCurrency() {
+        return currency;
+    }
+
+    public void setCurrency(String currency) {
+        this.currency = currency;
+    }
+
+    public Account getAccount() {
+        return account;
+    }
+
+    public void setAccount(Account account) {
+        this.account = account;
+    }
 }
