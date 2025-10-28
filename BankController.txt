@@ -23,3 +23,38 @@ public class AccountController {
         return accountRepository.save(account);
     }
 }
+
+
+
+//Transaction controller
+
+package com.finapp.backend.controller;
+
+import com.finapp.backend.entity.Transaction;
+import com.finapp.backend.repository.TransactionRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDate;
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/transactions")
+public class TransactionController {
+    @Autowired
+    private TransactionRepository transactionRepository;
+
+    @GetMapping
+    public List<Transaction> getTransactions(
+            @RequestParam Long accountId,
+            @RequestParam LocalDate start,
+            @RequestParam LocalDate end) {
+        return transactionRepository.findByAccountIdAndDateBetween(accountId, start, end);
+    }
+
+    @PostMapping
+    public Transaction createTransaction(@RequestBody Transaction txn) {
+        return transactionRepository.save(txn);
+    }
+}
+
