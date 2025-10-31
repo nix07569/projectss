@@ -79,6 +79,70 @@ function TransactionHistory({
   // Closing balance = opening + transactions in range
   const closingBalance = openingBalance - transactionTotal;
 
+  function handleDownload() {
+    const symbol = getCurrencySymbol(currency);
+    const title = `Transaction Report`;
+    const win = window.open("", "_blank", "noopener,noreferrer");
+    if (!win) return;
+    const rows = sortedTransactions
+      .map(
+        (txn) => `
+          <tr>
+            <td>${txn.date}</td>
+            <td>${txn.id || ""}</td>
+            <td>${txn.description || ""}</td>
+            <td style="text-align:right">${symbol} ${Number(txn.amount).toLocaleString(undefined,{ minimumFractionDigits: 2 })}</td>
+            <td>${txn.approver || ""}</td>
+          </tr>`
+      )
+      .join("");
+
+    const html = `
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>${title}</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 24px; }
+    h1 { font-size: 20px; margin-bottom: 8px; }
+    .balances { display: flex; gap: 24px; margin: 12px 0 20px; }
+    .balances span { font-weight: 600; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { border: 1px solid #ddd; padding: 8px; }
+    th { background: #f5f5f5; text-align: left; }
+    td { vertical-align: top; }
+  </style>
+</head>
+<body>
+  <h1>${title}</h1>
+  <div class="balances">
+    <div>Opening Balance: <span>${symbol} ${Number(openingBalance).toLocaleString(undefined,{ minimumFractionDigits: 2 })}</span></div>
+    <div>Closing Balance: <span>${symbol} ${Number(closingBalance).toLocaleString(undefined,{ minimumFractionDigits: 2 })}</span></div>
+  </div>
+  <table>
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Transaction ID</th>
+        <th>Description</th>
+        <th>Amount</th>
+        <th>Approved By</th>
+      </tr>
+    </thead>
+    <tbody>
+      ${rows}
+    </tbody>
+  </table>
+  <script>window.onload = () => { window.print(); setTimeout(() => window.close(), 100); };</script>
+</body>
+</html>`;
+
+    win.document.open();
+    win.document.write(html);
+    win.document.close();
+  }
+
   // Get currency symbol helper
   const getCurrencySymbol = (code) => {
     return currencies.find((c) => c.code === code)?.symbol || "$";
@@ -109,7 +173,7 @@ function TransactionHistory({
           <button className="clear-btn" onClick={() => setFilter({ start: "", end: "" })}>
             Clear
           </button>
-          <button className="download-btn">Download</button>
+          <button className="download-btn" onClick={handleDownload}>Download</button>
         </div>
       </div>
       <div className="txn-balances-row">
