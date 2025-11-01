@@ -6,15 +6,16 @@ import TransactionHistory from "./aaaaa/TransactionHistory";
 const accounts = [
   {
     id: 1,
-    name: "Alex Kumar",
+    name: "Alexx Kumar",
     accountNumber: "4412 1234 7890 6753",
     bankName: "Standard Chartered",
     transactions: [
-      {
+  { initialBalance: 5000000 }, // This object must be first or identifiable and excluded from list rendering
+  {
         date: "2025-10-07",
         id: "TNX005298076301",
         description: "Managerial Batch salary",
-        amount: 113800,
+        amount: 11380,
         approver: "Jane Margolis"
       },
       {
@@ -28,17 +29,17 @@ const accounts = [
         date: "2025-10-13",
         id: "TNX003591878654",
         description: "Executives Salary",
-        amount: 768636000,
+        amount: 76860,
         approver: "Mr.White"
       },
       {
         date: "2025-10-16",
         id: "TNX008922875820",
         description: "Miscellaneous",
-        amount: 42504000,
+        amount: 42500,
         approver: "Skyler"
       }
-    ],
+],
     balance: 97851.32,
     opening: 41000,
     closing: 168800,
@@ -187,6 +188,9 @@ export default function App() {
       <TransactionHistory
         transactions={selectedAccount.transactions}
         accountBalance={selectedAccount.balance}
+        accountName={selectedAccount.name}
+        accountNumber={selectedAccount.accountNumber}
+        bankName={selectedAccount.bankName}
         currency={currency}
       />
     </div>
