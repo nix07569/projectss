@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, { useState} from "react";
 import "./TransactionHistory.css";
+import html2pdf from "html2pdf.js";
 
 const currencies = [
   { code: "INR", symbol: "₹" },
@@ -21,6 +22,9 @@ function TransactionHistory({
   transactions = [],
   currency = "USD",
   accountBalance = 0,
+  accountName = "",
+  accountNumber = "",
+  bankName = "",
 }) {
   const [filter, setFilter] = useState({ start: "", end: "" });
 
@@ -81,66 +85,60 @@ function TransactionHistory({
 
   function handleDownload() {
     const symbol = getCurrencySymbol(currency);
-    const title = `Transaction Report`;
-    const win = window.open("", "_blank", "noopener,noreferrer");
-    if (!win) return;
-    const rows = sortedTransactions
-      .map(
-        (txn) => `
-          <tr>
-            <td>${txn.date}</td>
-            <td>${txn.id || ""}</td>
-            <td>${txn.description || ""}</td>
-            <td style="text-align:right">${symbol} ${Number(txn.amount).toLocaleString(undefined,{ minimumFractionDigits: 2 })}</td>
-            <td>${txn.approver || ""}</td>
-          </tr>`
-      )
-      .join("");
-
-    const html = `
-<!doctype html>
-<html>
-<head>
-  <meta charset="utf-8" />
-  <title>${title}</title>
-  <style>
-    body { font-family: Arial, sans-serif; margin: 24px; }
-    h1 { font-size: 20px; margin-bottom: 8px; }
-    .balances { display: flex; gap: 24px; margin: 12px 0 20px; }
-    .balances span { font-weight: 600; }
-    table { width: 100%; border-collapse: collapse; }
-    th, td { border: 1px solid #ddd; padding: 8px; }
-    th { background: #f5f5f5; text-align: left; }
-    td { vertical-align: top; }
-  </style>
-</head>
-<body>
-  <h1>${title}</h1>
-  <div class="balances">
-    <div>Opening Balance: <span>${symbol} ${Number(openingBalance).toLocaleString(undefined,{ minimumFractionDigits: 2 })}</span></div>
-    <div>Closing Balance: <span>${symbol} ${Number(closingBalance).toLocaleString(undefined,{ minimumFractionDigits: 2 })}</span></div>
-  </div>
-  <table>
-    <thead>
-      <tr>
-        <th>Date</th>
-        <th>Transaction ID</th>
-        <th>Description</th>
-        <th>Amount</th>
-        <th>Approved By</th>
-      </tr>
-    </thead>
-    <tbody>
-      ${rows}
-    </tbody>
-  </table>
-  <script>window.onload = () => { window.print(); setTimeout(() => window.close(), 100); };</script>
-</body>
-</html>`;
-
-    win.document.open();
-    win.document.write(html);
-    win.document.close();
+    const today = new Date().toISOString().split("T")[0];
+    
+    // Create HTML content for PDF
+    const content = document.createElement('div');
+    content.style.padding = '20px';
+    content.style.fontFamily = 'Arial, sans-serif';
+    
+    content.innerHTML = `
+      <h1 style="font-size: 20px; margin-bottom: 12px;">Transaction Report</h1>
+      <div style="margin: 16px 0 20px 0; font-size: 11px; border-bottom: 2px solid #333; padding-bottom: 12px;">
+        <div style="margin-bottom: 6px;"><strong>Account Name:</strong> ${accountName}</div>
+        <div style="margin-bottom: 6px;"><strong>Account Number:</strong> ${accountNumber}</div>
+        <div style="margin-bottom: 6px;"><strong>Bank:</strong> ${bankName}</div>
+        <div style="margin-bottom: 6px;"><strong>Current Balance:</strong> ${symbol} ${Number(accountBalance).toLocaleString(undefined, { minimumFractionDigits: 2 })}</div>
+      </div>
+      <div style="margin: 16px 0; font-size: 12px;">
+        <div style="margin-bottom: 8px;"><strong>Opening Balance:</strong> ${symbol} ${Number(openingBalance).toLocaleString(undefined, { minimumFractionDigits: 2 })}</div>
+        <div style="margin-bottom: 16px;"><strong>Closing Balance:</strong> ${symbol} ${Number(closingBalance).toLocaleString(undefined, { minimumFractionDigits: 2 })}</div>
+      </div>
+      <table style="width: 100%; border-collapse: collapse; font-size: 10px;">
+        <thead>
+          <tr style="background-color: #f5f5f5;">
+            <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Date</th>
+            <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Transaction ID</th>
+            <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Description</th>
+            <th style="border: 1px solid #ddd; padding: 8px; text-align: right;">Amount</th>
+            <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Approved By</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${sortedTransactions.map(txn => `
+            <tr>
+              <td style="border: 1px solid #ddd; padding: 8px;">${txn.date}</td>
+              <td style="border: 1px solid #ddd; padding: 8px;">${txn.id || ''}</td>
+              <td style="border: 1px solid #ddd; padding: 8px;">${txn.description || ''}</td>
+              <td style="border: 1px solid #ddd; padding: 8px; text-align: right;">${symbol} ${Number(txn.amount).toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
+              <td style="border: 1px solid #ddd; padding: 8px;">${txn.approver || ''}</td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    `;
+    
+    // Configure PDF options
+    const options = {
+      margin: 10,
+      filename: `transaction-report-${today}.pdf`,
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { scale: 2 },
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    };
+    
+    // Generate and download PDF
+    html2pdf().set(options).from(content).save();
   }
 
   // Get currency symbol helper
