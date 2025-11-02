@@ -1,79 +1,44 @@
-package com.finapp.backend.entity;
+package com.example.banking.model;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.time.LocalDate;
 
 @Entity
 public class Transaction {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long tid;
 
+    private String idNumber;
     private LocalDate date;
     private String description;
     private Double amount;
     private String approver;
-    private String currency;
 
     @ManyToOne
     @JoinColumn(name = "account_id")
     private Account account;
 
-    // Getters and Setters
+    // Getters & setters
+    public Long getTid() { return tid; }
+    public void setTid(Long tid) { this.tid = tid; }
 
-    public Long getId() {
-        return id;
-    }
+    public String getIdNumber() { return idNumber; }
+    public void setIdNumber(String idNumber) { this.idNumber = idNumber; }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+    public LocalDate getDate() { return date; }
+    public void setDate(LocalDate date) { this.date = date; }
 
-    public LocalDate getDate() {
-        return date;
-    }
+    public String getDescription() { return description; }
+    public void setDescription(String description) { this.description = description; }
 
-    public void setDate(LocalDate date) {
-        this.date = date;
-    }
+    public Double getAmount() { return amount; }
+    public void setAmount(Double amount) { this.amount = amount; }
 
-    public String getDescription() {
-        return description;
-    }
+    public String getApprover() { return approver; }
+    public void setApprover(String approver) { this.approver = approver; }
 
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public Double getAmount() {
-        return amount;
-    }
-
-    public void setAmount(Double amount) {
-        this.amount = amount;
-    }
-
-    public String getApprover() {
-        return approver;
-    }
-
-    public void setApprover(String approver) {
-        this.approver = approver;
-    }
-
-    public String getCurrency() {
-        return currency;
-    }
-
-    public void setCurrency(String currency) {
-        this.currency = currency;
-    }
-
-    public Account getAccount() {
-        return account;
-    }
-
-    public void setAccount(Account account) {
-        this.account = account;
-    }
+    public Account getAccount() { return account; }
+    public void setAccount(Account account) { this.account = account; }
 }
