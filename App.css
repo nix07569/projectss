@@ -15,3 +15,23 @@
     }
   ]
 }
+
+
+//Transaction
+    {
+  "name": "Alexx Kumar",
+  "accountNumber": "4412 1234 7890 6753",
+  "bankName": "Standard Chartered",
+  "currency": "USD",
+  "balance": 97851.32,
+  "transactions": [
+    {
+      "transactionId": "TNX005298076301",
+      "date": "2025-10-07",
+      "description": "Managerial Batch salary",
+      "amount": 11380,
+      "approver": "Jane Margolis",
+      "currency": "USD"
+    }
+  ]
+}
