@@ -1,37 +1,23 @@
-{
-  "name": "Alex Kumar",
-  "accountNumber": "4412123478906753",
-  "bankName": "Standard Chartered",
-  "balance": 97851.32,
-  "initialBalance": 5000000,
-  "currency": "USD",
-  "transactions": [
-    {
-      "date": "2025-10-07",
-      "txnId": "TNX005298076301",
-      "description": "Managerial Batch salary",
-      "amount": 11380,
-      "approver": "Jane Margolis"
-    }
-  ]
-}
+package com.example.banking.service;
 
+import com.example.banking.model.Account;
+import com.example.banking.repository.AccountRepository;
+import org.springframework.stereotype.Service;
+import java.util.List;
 
-//Transaction
-    {
-  "name": "Alexx Kumar",
-  "accountNumber": "4412 1234 7890 6753",
-  "bankName": "Standard Chartered",
-  "currency": "USD",
-  "balance": 97851.32,
-  "transactions": [
-    {
-      "transactionId": "TNX005298076301",
-      "date": "2025-10-07",
-      "description": "Managerial Batch salary",
-      "amount": 11380,
-      "approver": "Jane Margolis",
-      "currency": "USD"
+@Service
+public class AccountService {
+    private final AccountRepository repo;
+
+    public AccountService(AccountRepository repo) {
+        this.repo = repo;
     }
-  ]
+
+    public List<Account> getAllAccounts() {
+        return repo.findAll();
+    }
+
+    public Account getAccountById(Long id) {
+        return repo.findById(id).orElse(null);
+    }
 }
