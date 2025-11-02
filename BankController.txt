@@ -1,60 +1,29 @@
-package com.finapp.backend.controller;
+package com.example.banking.controller;
 
-import com.finapp.backend.entity.Account;
-import com.finapp.backend.repository.AccountRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.example.banking.model.Account;
+import com.example.banking.service.AccountService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/accounts")
+@CrossOrigin(origins = "http://localhost:3000")
 public class AccountController {
-    @Autowired
-    private AccountRepository accountRepository;
+
+    private final AccountService service;
+
+    public AccountController(AccountService service) {
+        this.service = service;
+    }
 
     @GetMapping
     public List<Account> getAllAccounts() {
-        return accountRepository.findAll();
+        return service.getAllAccounts();
     }
 
-    @PostMapping
-    public Account createAccount(@RequestBody Account account) {
-        return accountRepository.save(account);
-    }
-}
-
-
-
-//Transaction controller
-
-package com.finapp.backend.controller;
-
-import com.finapp.backend.entity.Transaction;
-import com.finapp.backend.repository.TransactionRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
-
-import java.time.LocalDate;
-import java.util.List;
-
-@RestController
-@RequestMapping("/api/transactions")
-public class TransactionController {
-    @Autowired
-    private TransactionRepository transactionRepository;
-
-    @GetMapping
-    public List<Transaction> getTransactions(
-            @RequestParam Long accountId,
-            @RequestParam LocalDate start,
-            @RequestParam LocalDate end) {
-        return transactionRepository.findByAccountIdAndDateBetween(accountId, start, end);
-    }
-
-    @PostMapping
-    public Transaction createTransaction(@RequestBody Transaction txn) {
-        return transactionRepository.save(txn);
+    @GetMapping("/{id}")
+    public Account getAccount(@PathVariable Long id) {
+        return service.getAccountById(id);
     }
 }
-
