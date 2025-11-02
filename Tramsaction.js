@@ -139,3 +139,32 @@ function TransactionHistory({
 }
 
 export default TransactionHistory;
+
+
+
+<tbody>
+  {/* Batches Data */}
+  {batches.map((b, i) => (
+    <tr key={`batch-${i}`}>
+      <td>{b.date}</td>
+      <td>-</td>
+      <td>{b.batchName}</td>
+      <td style={{ textAlign: "right" }}>-</td>
+      <td>-</td>
+    </tr>
+  ))}
+
+  {/* Employees Data */}
+  {employees.map((e, i) => (
+    <tr key={`emp-${i}`}>
+      <td>-</td>
+      <td>{e.transactionId}</td>
+      <td>-</td>
+      <td style={{ textAlign: "right" }}>
+        {getCurrencySymbol(currency)}{" "}
+        {Number(e.amount).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+      </td>
+      <td>{e.approver || "-"}</td>
+    </tr>
+  ))}
+</tbody>
