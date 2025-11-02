@@ -1,183 +1,46 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import LandingPage from "./aaaaa/LandingPage";
 import AccountHeader from "./aaaaa/AccountHeader";
 import TransactionHistory from "./aaaaa/TransactionHistory";
 
-const accounts = [
-  {
-    id: 1,
-    name: "Alexx Kumar",
-    accountNumber: "4412 1234 7890 6753",
-    bankName: "Standard Chartered",
-    transactions: [
-  { initialBalance: 5000000 }, // This object must be first or identifiable and excluded from list rendering
-  {
-        date: "2025-10-07",
-        id: "TNX005298076301",
-        description: "Managerial Batch salary",
-        amount: 11380,
-        approver: "Jane Margolis"
-      },
-      {
-        date: "2025-10-11",
-        id: "TNX0098765432",
-        description: "Operations Batch salary",
-        amount: 14000,
-        approver: "Jesse Pinkman"
-      },
-      {
-        date: "2025-10-13",
-        id: "TNX003591878654",
-        description: "Executives Salary",
-        amount: 76860,
-        approver: "Mr.White"
-      },
-      {
-        date: "2025-10-16",
-        id: "TNX008922875820",
-        description: "Miscellaneous",
-        amount: 42500,
-        approver: "Skyler"
-      }
-],
-    balance: 97851.32,
-    opening: 41000,
-    closing: 168800,
-    currency: "USD"
-  },
-  {
-    id: 2,
-    name: "Heisenberg",
-    accountNumber: "4412 1234 7890 6753",
-    bankName: "Standard Chartered",
-    transactions: [
-      {
-        date: "2025-10-07",
-        id: "TNX005298076301",
-        description: "Managerial Batch salary",
-        amount: 113800,
-        approver: "Jane Margolis"
-      },
-      {
-        date: "2025-10-11",
-        id: "TNX0098765432",
-        description: "Operations Batch salary",
-        amount: 14000,
-        approver: "Jesse Pinkman"
-      },
-      {
-        date: "2025-10-13",
-        id: "TNX003591878654",
-        description: "Executives Salary",
-        amount: 768636000,
-        approver: "Mr.White"
-      },
-      {
-        date: "2025-10-16",
-        id: "TNX008922875820",
-        description: "Miscellaneous",
-        amount: 42504000,
-        approver: "Skyler"
-      }
-    ],
-    balance: 97851.32,
-    opening: 41000,
-    closing: 168800,
-    currency: "USD"
-  },
-  {
-    id: 3,
-    name: "Elon Musk",
-    accountNumber: "4412 1234 7890 6753",
-    bankName: "Standard Chartered",
-    transactions: [
-      {
-        date: "2025-10-07",
-        id: "TNX005298076301",
-        description: "Managerial Batch salary",
-        amount: 113800,
-        approver: "Jane Margolis"
-      },
-      {
-        date: "2025-10-11",
-        id: "TNX0098765432",
-        description: "Operations Batch salary",
-        amount: 14000,
-        approver: "Jesse Pinkman"
-      },
-      {
-        date: "2025-10-13",
-        id: "TNX003591878654",
-        description: "Executives Salary",
-        amount: 768636000,
-        approver: "Mr.White"
-      },
-      {
-        date: "2025-10-16",
-        id: "TNX008922875820",
-        description: "Miscellaneous",
-        amount: 42504000,
-        approver: "Skyler"
-      }
-    ],
-    balance: 97851.32,
-    opening: 41000,
-    closing: 168800,
-    currency: "USD"
-  },
-  {
-    id: 4,
-    name: "Alex Kumar",
-    accountNumber: "4412 1234 7890 6753",
-    bankName: "Standard Chartered",
-    transactions: [
-      {
-        date: "2025-10-07",
-        id: "TNX005298076301",
-        description: "Managerial Batch salary",
-        amount: 25000,
-        approver: "Jane Margolis"
-      },
-      {
-        date: "2025-10-11",
-        id: "TNX0098765432",
-        description: "Operations Batch salary",
-        amount: 20000,
-        approver: "Jesse Pinkman"
-      },
-      {
-        date: "2025-10-13",
-        id: "TNX003591878654",
-        description: "Executives Salary",
-        amount: 15000,
-        approver: "Mr.White"
-      },
-      {
-        date: "2025-08-16",
-        id: "TNX008922875820",
-        description: "Miscellaneous",
-        amount: 10000,
-        approver: "Skyler"
-      }
-    ],
-    balance: 100000.00,
-    opening: 41000,
-    closing: 168800,
-    currency: "USD"
-  },
-];
-
 export default function App() {
+  const [accounts, setAccounts] = useState([]);
   const [selectedAccount, setSelectedAccount] = useState(null);
-  const [currency, setCurrency] = useState("INR");
+  const [currency, setCurrency] = useState("USD");
+
+  useEffect(() => {
+    fetch("http://localhost:8080/api/accounts")
+      .then((res) => res.json())
+      .then((data) => {
+        // Map backend model to frontend-friendly shape
+        const mapped = data.map((a) => ({
+          id: a.id,
+          name: a.name,
+          accountNumber: a.accountNumber,
+          bankName: a.bankName,
+          balance: a.balance,
+          initialBalance: a.initialBalance,
+          currency: a.currency || "USD",
+          transactions: (a.transactions || []).map((t) => ({
+            date: t.date,
+            id: t.txnId,
+            description: t.description,
+            amount: t.amount,
+            approver: t.approver,
+            currency: a.currency || "USD"
+          }))
+        }));
+        setAccounts(mapped);
+      })
+      .catch((err) => console.error(err));
+  }, []);
 
   if (!selectedAccount) {
-    return <LandingPage profiles={accounts} onSelectProfile={acc => { setSelectedAccount(acc); setCurrency(acc.currency); }} />;
+    return <LandingPage profiles={accounts} onSelectProfile={(acc) => { setSelectedAccount(acc); setCurrency(acc.currency); }} />;
   }
 
-  // You can add currency switch logic for balances here
   return (
-    <div>
+    <div style={{ padding: 20 }}>
       <AccountHeader
         name={selectedAccount.name}
         accountNumber={selectedAccount.accountNumber}
@@ -188,6 +51,7 @@ export default function App() {
       <TransactionHistory
         transactions={selectedAccount.transactions}
         accountBalance={selectedAccount.balance}
+        initialBalance={selectedAccount.initialBalance}
         accountName={selectedAccount.name}
         accountNumber={selectedAccount.accountNumber}
         bankName={selectedAccount.bankName}
