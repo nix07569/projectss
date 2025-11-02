@@ -13,7 +13,7 @@ export default function App() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Fetch all data
+  // Fetch all API data
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -41,21 +41,16 @@ export default function App() {
     fetchData();
   }, []);
 
-  if (loading) {
-    return <div style={{ textAlign: "center", marginTop: "40px" }}>Loading data...</div>;
-  }
+  if (loading)
+    return <div style={{ textAlign: "center", marginTop: "40px" }}>Loading accounts...</div>;
 
-  if (error) {
+  if (error)
     return <div style={{ color: "red", textAlign: "center" }}>{error}</div>;
-  }
 
-  // 🧩 LandingPage: merge bank accounts + currency info
+  // 🧩 LandingPage: combine accounts with currency info from batches
   if (!selectedAccount) {
     const mergedAccounts = bankAccounts.map((acc) => {
-      const relatedBatch = batches.find(
-        (b) => b.debitAccount === acc.accountNumber
-      );
-
+      const relatedBatch = batches.find((b) => b.debitAccount === acc.accountNumber);
       return {
         id: acc.id,
         name: acc.accountName,
@@ -79,22 +74,10 @@ export default function App() {
     );
   }
 
-  // 🧾 Map Transaction Data
   const relatedBatch = batches.find(
     (b) => b.debitAccount === selectedAccount.accountNumber
   );
   const accountCurrency = relatedBatch?.currency || currency;
-
-  // Combine batches + employees to make transaction objects
-  const transactions = employees
-    .filter((emp) => emp.batchId === relatedBatch?.id) // match employee to its batch
-    .map((emp) => ({
-      id: emp.transactionId, // from /api/employees
-      amount: emp.amount, // from /api/employees
-      date: relatedBatch?.date, // from /api/batches
-      description: relatedBatch?.batchName || relatedBatch?.description, // from /api/batches
-      approver: relatedBatch?.approvedBy || "N/A", // optional
-    }));
 
   return (
     <div>
@@ -106,12 +89,11 @@ export default function App() {
         onCurrencyChange={setCurrency}
       />
       <TransactionHistory
-        transactions={transactions} // ✅ merged data
+        batches={batches}
+        employees={employees}
         accountBalance={selectedAccount.balance}
-        initialBalance={selectedAccount.initialBalance || 0}
+        initialBalance={selectedAccount.initialBalance}
         currency={accountCurrency}
-        accountName={selectedAccount.accountName}
-        accountNumber={selectedAccount.accountNumber}
       />
     </div>
   );
