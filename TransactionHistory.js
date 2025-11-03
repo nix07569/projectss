@@ -7,29 +7,19 @@ const currencies = [
   { code: "USD", symbol: "$" },
 ];
 
-const exchangeRates = {
-  INR: 88, // 1 USD = 88 INR (example)
-  USD: 1,
-};
-
-function convertBalance(balance, target) {
-  return (balance * (exchangeRates[target] || 1)).toLocaleString(undefined, {
-    minimumFractionDigits: 2,
-  });
-}
-
 function TransactionHistory({
   transactions = [],
   currency = "USD",
-  accountBalance = 0,
   accountName = "",
   accountNumber = "",
-  bankName = "Standard Chartered",
-  initialBalance = 0, // ✅ use initialBalance from props
+  balance = ""
 }) {
   const [filter, setFilter] = useState({ start: "", end: "" });
 
-  // Default date range - one month ago to today
+  // ✅ Hardcoded initial balance
+  const initialBalance = 300000;
+
+  // Default date range (last 1 month)
   const getDefaultDateRange = () => {
     const today = new Date();
     const oneMonthAgo = new Date();
@@ -37,9 +27,9 @@ function TransactionHistory({
     return { start: oneMonthAgo, end: today };
   };
 
-  // Filter out transactions outside date range
+  // ✅ Filter by date range
   const filtered = transactions.filter((txn) => {
-    if (txn.initialBalance !== undefined) return false; // ignore placeholder
+    if (txn.initialBalance !== undefined) return false;
     const txnDate = new Date(txn.date);
     const defaultRange = getDefaultDateRange();
     const startDate = filter.start ? new Date(filter.start) : defaultRange.start;
@@ -47,106 +37,127 @@ function TransactionHistory({
     return txnDate >= startDate && txnDate <= endDate;
   });
 
-  // Sort transactions (newest first)
+  // ✅ Sort (newest first)
   const sortedTransactions = [...filtered].sort(
     (a, b) => new Date(b.date) - new Date(a.date)
   );
 
-  // Calculate opening balance
+  // ✅ Treat every transaction as deduction (positive → negative internally)
+  const adjustedTransactions = transactions.map((txn) => ({
+    ...txn,
+    amount: -Math.abs(txn.amount),
+  }));
+
+  const adjustedFiltered = sortedTransactions.map((txn) => ({
+    ...txn,
+    amount: -Math.abs(txn.amount),
+  }));
+
+  // ✅ Opening Balance = initial balance + total before start date
   const openingBalance = (() => {
     const defaultRange = getDefaultDateRange();
     const startDate = filter.start ? new Date(filter.start) : defaultRange.start;
 
-    const totalBeforeStart = transactions
-      .filter((txn) => {
-        if (txn.initialBalance !== undefined) return false;
-        return new Date(txn.date) < startDate;
-      })
+    const totalBeforeStart = adjustedTransactions
+      .filter((txn) => new Date(txn.date) < startDate)
       .reduce((sum, txn) => sum + txn.amount, 0);
 
     return initialBalance + totalBeforeStart;
   })();
 
-  // Calculate total of transactions in range
-  const transactionTotal = sortedTransactions.reduce(
+  // ✅ Total for selected range
+  const transactionTotal = adjustedFiltered.reduce(
     (sum, txn) => sum + txn.amount,
     0
   );
 
-  // Closing balance
-  const closingBalance = openingBalance - transactionTotal;
+  // ✅ Closing Balance
+  const closingBalance = openingBalance + transactionTotal;
 
-  // Helper: Get currency symbol
+  // ✅ Sync account balance
+  //const accountBalance = closingBalance;
+
+  // ✅ Currency symbol
   const getCurrencySymbol = (code) =>
     currencies.find((c) => c.code === code)?.symbol || "$";
 
-  // Download PDF handler
+  // ✅ PDF Download
   function handleDownload() {
-    const symbol = getCurrencySymbol(currency);
-    const today = new Date().toISOString().split("T")[0];
+  const symbol = getCurrencySymbol(currency);
+  const today = new Date().toISOString().split("T")[0];
 
-    const content = document.createElement("div");
-    content.style.padding = "20px";
-    content.style.fontFamily = "Arial, sans-serif";
+  const content = document.createElement("div");
+  content.style.padding = "24px";
+  content.style.fontFamily = "'Poppins', Arial, sans-serif";
+  content.style.color = "#333";
+  content.style.backgroundColor = "#fff";
 
-    content.innerHTML = `
-      <h1 style="font-size: 20px; margin-bottom: 12px;">Transaction Report</h1>
-      <div style="margin: 16px 0 20px 0; font-size: 11px; border-bottom: 2px solid #333; padding-bottom: 12px;">
-        <div style="margin-bottom: 6px;"><strong>Account Name:</strong> ${accountName}</div>
-        <div style="margin-bottom: 6px;"><strong>Account Number:</strong> ${accountNumber}</div>
-        <div style="margin-bottom: 6px;"><strong>Bank:</strong> ${bankName}</div>
-        <div style="margin-bottom: 6px;"><strong>Current Balance:</strong> ${symbol} ${Number(
-      accountBalance
-    ).toLocaleString(undefined, { minimumFractionDigits: 2 })}</div>
+  content.innerHTML = `
+    <div style="text-align: center; margin-bottom: 20px;">
+      <h1 style="font-size: 22px; color: #1e2a5e; margin-bottom: 6px;">Transaction Report</h1>
+      <p style="font-size: 11px; color: #777;">Generated on ${new Date().toLocaleString()}</p>
+    </div>
+
+    <div style="border: 1px solid #ddd; border-radius: 8px; padding: 16px; margin-bottom: 18px;">
+      <h3 style="font-size: 13px; color: #1e2a5e; margin-bottom: 10px; border-bottom: 2px solid #0077b6; display: inline-block; padding-bottom: 2px;">Account Details</h3>
+      <div style="font-size: 11px; line-height: 1.6;">
+        <div><strong>Account Name:</strong> ${accountName}</div>
+        <div><strong>Account Number:</strong> ${accountNumber}</div>
+        <div><strong>Bank:</strong>Standard Chartered</div>
+        <div><strong>Current Balance:</strong> ${symbol} ${Number(balance).toLocaleString(undefined, { minimumFractionDigits: 2 })}</div>
       </div>
-      <div style="margin: 16px 0; font-size: 12px;">
-        <div style="margin-bottom: 8px;"><strong>Opening Balance:</strong> ${symbol} ${Number(
-      openingBalance
-    ).toLocaleString(undefined, { minimumFractionDigits: 2 })}</div>
-        <div style="margin-bottom: 16px;"><strong>Closing Balance:</strong> ${symbol} ${Number(
-      closingBalance
-    ).toLocaleString(undefined, { minimumFractionDigits: 2 })}</div>
+    </div>
+
+    <div style="border: 1px solid #ddd; border-radius: 8px; padding: 16px; margin-bottom: 20px;">
+      <h3 style="font-size: 13px; color: #1e2a5e; margin-bottom: 10px; border-bottom: 2px solid #0077b6; display: inline-block; padding-bottom: 2px;">Summary</h3>
+      <div style="font-size: 11px; line-height: 1.6;">
+        <div><strong>Opening Balance:</strong> ${symbol} ${Number(openingBalance).toLocaleString(undefined, { minimumFractionDigits: 2 })}</div>
+        <div><strong>Closing Balance:</strong> ${symbol} ${Number(closingBalance).toLocaleString(undefined, { minimumFractionDigits: 2 })}</div>
       </div>
-      <table style="width: 100%; border-collapse: collapse; font-size: 10px;">
-        <thead>
-          <tr style="background-color: #f5f5f5;">
-            <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Date</th>
-            <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Transaction ID</th>
-            <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Description</th>
-            <th style="border: 1px solid #ddd; padding: 8px; text-align: right;">Amount</th>
-            <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Approved By</th>
+    </div>
+
+    <table style="width: 100%; border-collapse: collapse; font-size: 10px; box-shadow: 0 0 5px rgba(0,0,0,0.05); text-align: center;">
+      <thead>
+        <tr style="background-color: #0077b6; color: white;">
+          <th style="border: 1px solid #ddd; padding: 8px;">Date</th>
+          <th style="border: 1px solid #ddd; padding: 8px;">Transaction ID</th>
+          <th style="border: 1px solid #ddd; padding: 8px;">Batch Name</th>
+          <th style="border: 1px solid #ddd; padding: 8px;">Amount</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${sortedTransactions
+          .map(
+            (txn, index) => `
+          <tr style="background-color: ${index % 2 === 0 ? "#f8f9fa" : "#ffffff"};">
+            <td style="border: 1px solid #ddd; padding: 8px;">${txn.date}</td>
+            <td style="border: 1px solid #ddd; padding: 8px;">${txn.id}</td>
+            <td style="border: 1px solid #ddd; padding: 8px;">${txn.batchName}</td>
+            <td style="border: 1px solid #ddd; padding: 8px;">${symbol} ${Number(txn.amount).toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
           </tr>
-        </thead>
-        <tbody>
-          ${sortedTransactions
-            .map(
-              (txn) => `
-            <tr>
-              <td style="border: 1px solid #ddd; padding: 8px;">${txn.date}</td>
-              <td style="border: 1px solid #ddd; padding: 8px;">${txn.id || ""}</td>
-              <td style="border: 1px solid #ddd; padding: 8px;">${txn.description || ""}</td>
-              <td style="border: 1px solid #ddd; padding: 8px; text-align: right;">${symbol} ${Number(
-                txn.amount
-              ).toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
-              <td style="border: 1px solid #ddd; padding: 8px;">${txn.approver || ""}</td>
-            </tr>
-          `
-            )
-            .join("")}
-        </tbody>
-      </table>
-    `;
+        `
+          )
+          .join("")}
+      </tbody>
+    </table>
 
-    const options = {
-      margin: 10,
-      filename: `transaction-report-${today}.pdf`,
-      image: { type: "jpeg", quality: 0.98 },
-      html2canvas: { scale: 2 },
-      jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
-    };
+    <div style="margin-top: 20px; text-align: right; font-size: 10px; color: #777; border-top: 1px solid #ccc; padding-top: 8px;">
+      <em>End of Report</em>
+    </div>
+  `;
 
-    html2pdf().set(options).from(content).save();
-  }
+  const options = {
+    margin: 10,
+    filename: `transaction-report-${today}.pdf`,
+    image: { type: "jpeg", quality: 0.98 },
+    html2canvas: { scale: 2 },
+    jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
+  };
+
+  html2pdf().set(options).from(content).save();
+}
+
+
 
   return (
     <div className="txn-root">
@@ -171,10 +182,7 @@ function TransactionHistory({
           </label>
         </div>
         <div className="txn-actions">
-          <button
-            className="clear-btn"
-            onClick={() => setFilter({ start: "", end: "" })}
-          >
+          <button className="clear-btn" onClick={() => setFilter({ start: "", end: "" })}>
             Clear
           </button>
           <button className="download-btn" onClick={handleDownload}>
@@ -188,15 +196,15 @@ function TransactionHistory({
         <span className="openingBalance">
           Opening Balance:{" "}
           <strong>
-            {getCurrencySymbol(currency)}
-            {convertBalance(openingBalance, currency)}
+            {getCurrencySymbol(currency)}{" "}
+            {openingBalance.toLocaleString(undefined, { minimumFractionDigits: 2 })}
           </strong>
         </span>
         <span className="closingBalance">
           Closing Balance:{" "}
           <strong>
-            {getCurrencySymbol(currency)}
-            {convertBalance(closingBalance, currency)}
+            {getCurrencySymbol(currency)}{" "}
+            {closingBalance.toLocaleString(undefined, { minimumFractionDigits: 2 })}
           </strong>
         </span>
       </div>
@@ -213,14 +221,14 @@ function TransactionHistory({
           </tr>
         </thead>
         <tbody>
-          {sortedTransactions.map((txn, i) => (
+          {adjustedFiltered.map((txn, i) => (
             <tr key={txn.id || i}>
               <td>{txn.date}</td>
               <td>{txn.id}</td>
               <td>{txn.description}</td>
               <td style={{ textAlign: "right" }}>
                 {getCurrencySymbol(currency)}{" "}
-                {txn.amount.toLocaleString(undefined, {
+                {Math.abs(txn.amount).toLocaleString(undefined, {
                   minimumFractionDigits: 2,
                 })}
               </td>
