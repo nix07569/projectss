@@ -1,34 +1,3 @@
-export default function App() {
-  const [selectedAccount, setSelectedAccount] = useState(null);
-  const [currency, setCurrency] = useState("INR");
-
-  if (!selectedAccount) {
-    return <LandingPage profiles={accounts} onSelectProfile={acc => { setSelectedAccount(acc); setCurrency(acc.currency); }} />;
-  }
-
-  // You can add currency switch logic for balances here
-  return (
-    <div>
-      <AccountHeader
-        name={selectedAccount.name}
-        accountNumber={selectedAccount.accountNumber}
-        balance={selectedAccount.balance}
-        currency={currency}
-      />
-      <TransactionHistory
-        transactions={selectedAccount.transactions}
-        balance={selectedAccount.balance}
-        currency={currency}
-        accountName ={selectedAccount.name}
-        accountNumber ={selectedAccount.accountNumber}
-      />
-    </div>
-  );
-}
-
-
-
-//lund
 import React, { useState } from "react";
 import LandingPage from "./aaaaa/LandingPage";
 import AccountHeader from "./aaaaa/AccountHeader";
@@ -37,7 +6,7 @@ import TransactionHistory from "./aaaaa/TransactionHistory";
 const accounts = [
   {
     id: 1,
-    name: "Alexx Kumar",
+    name: "Alex Kumar",
     accountNumber: "4412 1234 7890 6753",
     initialBalance: 3000000,
     transactions: [
@@ -202,13 +171,13 @@ export default function App() {
         accountNumber={selectedAccount.accountNumber}
         balance={selectedAccount.balance}
         currency={currency}
-        onCurrencyChange={setCurrency}
       />
       <TransactionHistory
         transactions={selectedAccount.transactions}
-        accountBalance={selectedAccount.balance}
-        initialBalance={selectedAccount.initialBalance}
+        balance={selectedAccount.balance}
         currency={currency}
+        accountName ={selectedAccount.name}
+        accountNumber ={selectedAccount.accountNumber}
       />
     </div>
   );
