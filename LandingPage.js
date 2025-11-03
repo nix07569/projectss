@@ -15,7 +15,7 @@ export default function LandingPage({ profiles, onSelectProfile }) {
           >
             <div className="profile-name">{profile.name}</div>
             <div className="profile-accnum">{profile.accountNumber}</div>
-            <div className="profile-bank">{profile.bankName}</div>
+            <div className="profile-bank">standard chartered</div>
           </div>
         ))}
       </div>
