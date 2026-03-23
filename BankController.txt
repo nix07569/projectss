@@ -1,78 +1,43 @@
-<mvc:View controllerName="project1.controller.task1"
-    xmlns:mvc="sap.ui.core.mvc" displayBlock="true"
-    xmlns="sap.m">
+<VBox id="kpiGrid" width="40%" class="sapUiSmallMarginEnd">
     
-    <Page id="mainPage" title="Task_One">
-        <content>
-            
-            <Title id="dashboardMainTitle" text="MFU Dashboard" level="H2" class="sapUiMediumMargin" />
+    <HBox id="kpiTopRow" width="100%" class="sapUiSmallMarginBottom">
+        
+        <VBox id="cardUploaded" class="customKpiCard sapUiSmallMarginEnd" width="50%">
+            <Text id="titleUploaded" text="Total MFU Uploaded" class="kpiTitle" />
+            <VBox id="valBoxUp">
+                <Text id="valUploaded" text="71" class="kpiValue" />
+                <Text id="subUploaded" text="MFU_COUNT" class="kpiSubText" />
+            </VBox>
+        </VBox>
 
-            <HBox id="row2Container" class="sapUiSmallMargin">
-                
-                <VBox id="kpiGrid" width="40%">
-                    
-                    <HBox id="kpiTopRow">
-                        <GenericTile id="tileUploaded" class="sapUiTinyMarginBegin sapUiTinyMarginTop" header="Total MFU Uploaded" subheader="MFU_COUNT">
-                            <TileContent id="contentUploaded">
-                                <NumericContent id="numUploaded" value="71" valueColor="Good" />
-                            </TileContent>
-                        </GenericTile>
-                        
-                        <GenericTile id="tileApproved" class="sapUiTinyMarginBegin sapUiTinyMarginTop" header="Total MFU Approved" subheader="MFU_COUNT">
-                            <TileContent id="contentApproved">
-                                <NumericContent id="numApproved" value="60" valueColor="Good" />
-                            </TileContent>
-                        </GenericTile>
-                    </HBox>
+        <VBox id="cardApproved" class="customKpiCard" width="50%">
+            <Text id="titleApproved" text="Total MFU Approved" class="kpiTitle" />
+            <VBox id="valBoxApp">
+                <Text id="valApproved" text="60" class="kpiValue" />
+                <Text id="subApproved" text="MFU_COUNT" class="kpiSubText" />
+            </VBox>
+        </VBox>
 
-                    <HBox id="kpiBottomRow">
-                        <GenericTile id="tileOnboarded" class="sapUiTinyMarginBegin sapUiTinyMarginTop" header="MFU Template Onboarded" subheader="MFU_COUNT">
-                            <TileContent id="contentOnboarded">
-                                <NumericContent id="numOnboarded" value="114" valueColor="Good" />
-                            </TileContent>
-                        </GenericTile>
+    </HBox>
 
-                        <GenericTile id="tileRejected" class="sapUiTinyMarginBegin sapUiTinyMarginTop" header="Total MFU Rejected" subheader="MFU_COUNT">
-                            <TileContent id="contentRejected">
-                                <NumericContent id="numRejected" value="0" valueColor="Error" /> 
-                            </TileContent>
-                        </GenericTile>
-                    </HBox>
-                </VBox>
+    <HBox id="kpiBottomRow" width="100%">
+        
+        <VBox id="cardOnboarded" class="customKpiCard sapUiSmallMarginEnd" width="50%">
+            <Text id="titleOnboarded" text="MFU Template Onboarded" class="kpiTitle" />
+            <VBox id="valBoxOnb">
+                <Text id="valOnboarded" text="114" class="kpiValue" />
+                <Text id="subOnboarded" text="MFU_COUNT" class="kpiSubText" />
+            </VBox>
+        </VBox>
 
-                <Panel id="mainChartPanel" width="60%" headerText="MFU Templates by Modules" class="sapUiTinyMarginBegin">
-                    <Text id="mainChartPlaceholderText" text="(Stacked Bar Chart will go here)" />
-                </Panel>
-                
-            </HBox>
+        <VBox id="cardRejected" class="customKpiCard" width="50%">
+            <Text id="titleRejected" text="Total MFU Rejected" class="kpiTitle" />
+            <VBox id="valBoxRej">
+                <Text id="valRejected" text="-" class="kpiValue" /> 
+                <Text id="subRejected" text="MFU_COUNT" class="kpiSubText" />
+            </VBox>
+        </VBox>
 
-            <HBox id="row3Container" class="sapUiSmallMargin">
-                <Panel id="panelPie" width="25%" headerText="MFU Templates by Count"><Text id="textPie" text="(Pie Chart)" /></Panel>
-                <Panel id="panelBarMonth" width="25%" headerText="Top 3 by Month"><Text id="textBarMonth" text="(Bar Chart)" /></Panel>
-                <Panel id="panelBarQuarter" width="25%" headerText="Top 3 by Quarter"><Text id="textBarQuarter" text="(Bar Chart)" /></Panel>
-                <Panel id="panelBarYear" width="25%" headerText="Top 3 by Year"><Text id="textBarYear" text="(Bar Chart)" /></Panel>
-            </HBox>
+    </HBox>
 
-            <Table id="mfuTable" headerText="MFU Details" class="sapUiSmallMargin">
-                <columns>
-                    <Column id="colModule"><Text id="colText1" text="MODULE NAME" /></Column>
-                    <Column id="colSubModule"><Text id="colText2" text="SUB MODULE NAME" /></Column>
-                    <Column id="colLoadType"><Text id="colText3" text="LOAD TYPE" /></Column>
-                    <Column id="colLoadTemplate"><Text id="colText4" text="LOAD TEMPLATE" /></Column>
-                </columns>
-
-                <items>
-                    <ColumnListItem id="row1">
-                        <cells>
-                            <Text id="cell1_1" text="ESG" />
-                            <Text id="cell1_2" text="MAPPING MASTER" />
-                            <Text id="cell1_3" text="TRUNCATE" />
-                            <Text id="cell1_4" text="MFU_BOOKING_ENTITY_SLATE" />
-                        </cells>
-                    </ColumnListItem>
-                </items>
-            </Table>
-
-        </content>
-    </Page>
-</mvc:View>
+</VBox>
