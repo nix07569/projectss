@@ -1,29 +1,50 @@
-package com.example.banking.controller;
+<Title text="MFU Dashboard" level="H2" class="sapUiMediumMargin" />
 
-import com.example.banking.model.Account;
-import com.example.banking.service.AccountService;
-import org.springframework.web.bind.annotation.*;
+<HBox class="sapUiSmallMargin">
+    
+    <VBox width="40%">
+        <HBox>
+            <GenericTile class="sapUiTinyMarginBegin sapUiTinyMarginTop" header="Total MFU Uploaded" subheader="MFU_COUNT">
+                <TileContent>
+                    <NumericContent value="71" valueColor="Good" />
+                </TileContent>
+            </GenericTile>
+            
+            </HBox>
+        <HBox>
+             </HBox>
+    </VBox>
 
-import java.util.List;
+    <Panel width="60%" headerText="MFU Templates by Modules" class="sapUiTinyMarginBegin">
+        <Text text="(Stacked Bar Chart will go here)" />
+    </Panel>
 
-@RestController
-@RequestMapping("/api/accounts")
-@CrossOrigin(origins = "http://localhost:3000")
-public class AccountController {
+</HBox>
 
-    private final AccountService service;
+<HBox class="sapUiSmallMargin">
+    <Panel width="25%" headerText="MFU Templates by Count"><Text text="(Pie Chart)" /></Panel>
+    <Panel width="25%" headerText="Top 3 by Month"><Text text="(Bar Chart)" /></Panel>
+    <Panel width="25%" headerText="Top 3 by Quarter"><Text text="(Bar Chart)" /></Panel>
+    <Panel width="25%" headerText="Top 3 by Year"><Text text="(Bar Chart)" /></Panel>
+</HBox>
 
-    public AccountController(AccountService service) {
-        this.service = service;
-    }
+<Table id="mfuTable" headerText="MFU Details" class="sapUiSmallMargin">
+    <columns>
+        <Column><Text text="MODULE NAME" /></Column>
+        <Column><Text text="SUB MODULE NAME" /></Column>
+        <Column><Text text="LOAD TYPE" /></Column>
+        <Column><Text text="LOAD TEMPLATE" /></Column>
+    </columns>
 
-    @GetMapping
-    public List<Account> getAllAccounts() {
-        return service.getAllAccounts();
-    }
-
-    @GetMapping("/{id}")
-    public Account getAccount(@PathVariable Long id) {
-        return service.getAccountById(id);
-    }
-}
+    <items>
+        <ColumnListItem>
+            <cells>
+                <Text text="ESG" />
+                <Text text="MAPPING MASTER" />
+                <Text text="TRUNCATE" />
+                <Text text="MFU_BOOKING_ENTITY_SLATE" />
+            </cells>
+        </ColumnListItem>
+        
+        </items>
+</Table>
