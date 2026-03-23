@@ -1,50 +1,32 @@
-<Title text="MFU Dashboard" level="H2" class="sapUiMediumMargin" />
-
-<HBox class="sapUiSmallMargin">
+<mvc:View controllerName="project1.controller.task1"
+    xmlns:mvc="sap.ui.core.mvc" displayBlock="true"
+    xmlns="sap.m">
     
-    <VBox width="40%">
-        <HBox>
-            <GenericTile class="sapUiTinyMarginBegin sapUiTinyMarginTop" header="Total MFU Uploaded" subheader="MFU_COUNT">
-                <TileContent>
-                    <NumericContent value="71" valueColor="Good" />
-                </TileContent>
-            </GenericTile>
+    <Page id="page" title="Task_One">
+        <content>
             
+            <Title text="MFU Dashboard" level="H2" class="sapUiMediumMargin" />
+
+            <HBox class="sapUiSmallMargin">
+                
+                <VBox width="40%">
+                    <HBox>
+                        <GenericTile class="sapUiTinyMarginBegin sapUiTinyMarginTop" header="Total MFU Uploaded" subheader="MFU_COUNT">
+                            <TileContent>
+                                <NumericContent value="71" valueColor="Good" />
+                            </TileContent>
+                        </GenericTile>
+                    </HBox>
+                    <HBox>
+                        </HBox>
+                </VBox>
+
+                <Panel width="60%" headerText="MFU Templates by Modules" class="sapUiTinyMarginBegin">
+                    <Text text="(Stacked Bar Chart will go here)" />
+                </Panel>
+                
             </HBox>
-        <HBox>
-             </HBox>
-    </VBox>
 
-    <Panel width="60%" headerText="MFU Templates by Modules" class="sapUiTinyMarginBegin">
-        <Text text="(Stacked Bar Chart will go here)" />
-    </Panel>
-
-</HBox>
-
-<HBox class="sapUiSmallMargin">
-    <Panel width="25%" headerText="MFU Templates by Count"><Text text="(Pie Chart)" /></Panel>
-    <Panel width="25%" headerText="Top 3 by Month"><Text text="(Bar Chart)" /></Panel>
-    <Panel width="25%" headerText="Top 3 by Quarter"><Text text="(Bar Chart)" /></Panel>
-    <Panel width="25%" headerText="Top 3 by Year"><Text text="(Bar Chart)" /></Panel>
-</HBox>
-
-<Table id="mfuTable" headerText="MFU Details" class="sapUiSmallMargin">
-    <columns>
-        <Column><Text text="MODULE NAME" /></Column>
-        <Column><Text text="SUB MODULE NAME" /></Column>
-        <Column><Text text="LOAD TYPE" /></Column>
-        <Column><Text text="LOAD TEMPLATE" /></Column>
-    </columns>
-
-    <items>
-        <ColumnListItem>
-            <cells>
-                <Text text="ESG" />
-                <Text text="MAPPING MASTER" />
-                <Text text="TRUNCATE" />
-                <Text text="MFU_BOOKING_ENTITY_SLATE" />
-            </cells>
-        </ColumnListItem>
-        
-        </items>
-</Table>
+        </content>
+    </Page>
+</mvc:View>
