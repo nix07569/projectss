@@ -49,33 +49,25 @@
 bdhsjskskskslakskshvdbdksisgs
 
 
+<Panel id="mainChartPanel" width="60%" class="customKpiCard">
+                                <Title id="stackedTitle" text="MFU Templates by Modules" level="H3" class="sapUiSmallMarginBottom"/>
+                                <viz:VizFrame id="stackedChart" vizType="stacked_column" width="100%" height="250px" uiConfig="{applicationSet:'fiori'}">
+                                    <viz:dataset>
+                                        <viz.data:FlattenedDataset id="stackDataset" data="{/StackedData}">
+                                            <viz.data:dimensions><viz.data:DimensionDefinition id="dimModule" name="Module" value="{Module}" /></viz.data:dimensions>
+                                            <viz.data:measures>
+                                                <viz.data:MeasureDefinition id="measApproved" name="Approved" value="{Approved}" />
+                                                <viz.data:MeasureDefinition id="measPending" name="Pending" value="{Pending}" />
+                                                <viz.data:MeasureDefinition id="measUploaded" name="Uploaded" value="{Uploaded}" />
+                                            </viz.data:measures>
+                                        </viz.data:FlattenedDataset>
+                                    </viz:dataset>
+                                    <viz:feeds>
+                                        <viz.feeds:FeedItem id="feedValueAxis" uid="valueAxis" type="Measure" values="Approved,Pending,Uploaded" />
+                                        <viz.feeds:FeedItem id="feedCategoryAxis" uid="categoryAxis" type="Dimension" values="Module" />
+                                    </viz:feeds>
+                                </viz:VizFrame>
+                            </Panel>
 
-<Panel id="mainChartPanel" width="60%" class="sapUiTinyMarginBegin customKpiCard">
-    <Title text="MFU Templates by Modules" level="H3" class="sapUiSmallMarginBottom"/>
-    
-    <viz:VizFrame id="stackedChart" vizType="stacked_column" width="100%" height="300px" 
-        uiConfig="{applicationSet:'fiori'}"
-        vizProperties="{ plotArea: { dataLabel: { visible: true } }, title: { visible: false } }">
-        
-        <viz:dataset>
-            <viz.data:FlattenedDataset data="{/StackedData}">
-                <viz.data:dimensions>
-                    <viz.data:DimensionDefinition name="Module" value="{Module}" />
-                </viz.data:dimensions>
-                
-                <viz.data:measures>
-                    <viz.data:MeasureDefinition name="Approved" value="{Approved}" />
-                    <viz.data:MeasureDefinition name="Pending" value="{Pending}" />
-                    <viz.data:MeasureDefinition name="Uploaded" value="{Uploaded}" />
-                </viz.data:measures>
-            </viz.data:FlattenedDataset>
-        </viz:dataset>
 
-        <viz:feeds>
-            <viz.feeds:FeedItem uid="valueAxis" type="Measure" values="Approved,Pending,Uploaded" />
-            <viz.feeds:FeedItem uid="categoryAxis" type="Dimension" values="Module" />
-        </viz:feeds>
-        
-    </viz:VizFrame>
-</Panel>
 
