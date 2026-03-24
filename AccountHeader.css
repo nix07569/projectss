@@ -1,68 +1,156 @@
-/* AccountHeader.css */
-.account-header-root {
-  background: linear-gradient(160deg, #1e2b3f 0%, #466c98 120%);
-  color: #fff;
-  border-radius:30px;
-  margin: 36px auto 26px auto;
-  min-height: 97px;
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  box-shadow: 0 7px 28px rgba(31,93,160,0.13);
-  padding: 33px 34px 22px 38px;
-  max-width: 1050px;
-  width: 90vw;
-  position: relative;
-}
+<HBox id="dashboardBottomHalf" width="100%" class="sapUiSmallMarginBottom sapUiSmallMarginBeginEnd flushTopContainer">
+    
+    <Panel id="panelPie" width="25%" class="customKpiCard sapUiTinyMarginEnd">
+        <Title id="pieTitle" text="MFU Templates by Count" level="H3" class="sapUiSmallMarginBottom"/>
+        <viz:VizFrame id="pieChart" vizType="pie" width="100%" height="220px" uiConfig="{applicationSet:'fiori'}"
+            vizProperties="{ title: { visible: false }, legendGroup: { layout: { position: 'top' } } }">
+            <viz:dataset>
+                <viz.data:FlattenedDataset id="pieDataset" data="{/PieData}">
+                    <viz.data:dimensions><viz.data:DimensionDefinition id="pieDimModule" name="Module" value="{Module}" /></viz.data:dimensions>
+                    <viz.data:measures><viz.data:MeasureDefinition id="pieMeasPerc" name="Percentage" value="{Percentage}" /></viz.data:measures>
+                </viz.data:FlattenedDataset>
+            </viz:dataset>
+            <viz:feeds>
+                <viz.feeds:FeedItem id="pieFeedSize" uid="size" type="Measure" values="Percentage" />
+                <viz.feeds:FeedItem id="pieFeedColor" uid="color" type="Dimension" values="Module" />
+            </viz:feeds>
+        </viz:VizFrame>
+    </Panel>
 
-.account-header-root h2 {
-  font-size: 4rem;
-  font-weight: 650;
-  margin: 0 0 6px 20px;
-  letter-spacing: 3px;
-}
-.account-header-accnum {
-  font-size: 1.3rem;
-  font-family: 'Consolas', monospace;
-  color: #a9bed7;
-  margin: 6px 0 20px 40px;
-  opacity: 0.8;
-  letter-spacing: 3px;
-}
-.account-header-balance-section {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  background: rgba(255, 255, 255, 0.14);
-  box-shadow: 0 1px 8px rgba(49,93,168,.15);
-  border-radius: 20px;
-  padding: 25px 20px 25px 22px;
-  position: absolute;
-  right: 36px;
-  top: 46px;
-  min-width: 195px;
-}
-.account-header-balance-amount {
-  font-size: 40px;
-  font-weight: 700;
-  letter-spacing: 2px;
-  color: #fff;
-  margin-right: 13px;
-  margin-left: 10px;
-}
-.account-header-select {
-  border: none;
-  padding: 6px 8px;
-  border-radius: 9px;
-  background: rgba(255, 255, 255, 0.873);
-  color: #14478e;
-  font-size: 1.09rem;
-  font-weight: 600;
-  outline: none;
-  margin-top: 3px;
-  transition: background .11s;
-  box-shadow: 0 2px 5px rgba(59,96,186,0.07);
-}
-.account-header-select:focus {
-  background: #dde6fa;
-}
+    <Panel id="panelMonth" width="25%" class="customKpiCard sapUiTinyMarginEnd">
+        <Text id="titleMonth" text="Top 3 MFU Templates by&#10;Usage&#10;(by Month)" class="sapUiSmallMarginBottom" />
+        <viz:VizFrame id="chartMonth" vizType="column" width="100%" height="200px" uiConfig="{applicationSet:'fiori'}"
+            vizProperties="{ title: { visible: false }, legend: { visible: false }, plotArea: { dataLabel: { visible: true }, colorPalette: ['#42B8D4'] } }">
+            <viz:dataset>
+                <viz.data:FlattenedDataset id="dsMonth" data="{/MonthData}">
+                    <viz.data:dimensions><viz.data:DimensionDefinition id="dimMonth" name="Module" value="{Module}" /></viz.data:dimensions>
+                    <viz.data:measures><viz.data:MeasureDefinition id="measMonth" name="Usage" value="{Usage}" /></viz.data:measures>
+                </viz.data:FlattenedDataset>
+            </viz:dataset>
+            <viz:feeds>
+                <viz.feeds:FeedItem id="feedMonthVal" uid="valueAxis" type="Measure" values="Usage" />
+                <viz.feeds:FeedItem id="feedMonthCat" uid="categoryAxis" type="Dimension" values="Module" />
+            </viz:feeds>
+        </viz:VizFrame>
+    </Panel>
+
+    <Panel id="panelQuarter" width="25%" class="customKpiCard sapUiTinyMarginEnd">
+        <Text id="titleQuarter" text="Top 3 MFU Templates by&#10;Usage&#10;(by Quarter)" class="sapUiSmallMarginBottom" />
+        <viz:VizFrame id="chartQuarter" vizType="column" width="100%" height="200px" uiConfig="{applicationSet:'fiori'}"
+            vizProperties="{ title: { visible: false }, legend: { visible: false }, plotArea: { dataLabel: { visible: true }, colorPalette: ['#2B4A8E'] } }">
+            <viz:dataset>
+                <viz.data:FlattenedDataset id="dsQuarter" data="{/QuarterData}">
+                    <viz.data:dimensions><viz.data:DimensionDefinition id="dimQuarter" name="Module" value="{Module}" /></viz.data:dimensions>
+                    <viz.data:measures><viz.data:MeasureDefinition id="measQuarter" name="Usage" value="{Usage}" /></viz.data:measures>
+                </viz.data:FlattenedDataset>
+            </viz:dataset>
+            <viz:feeds>
+                <viz.feeds:FeedItem id="feedQuarterVal" uid="valueAxis" type="Measure" values="Usage" />
+                <viz.feeds:FeedItem id="feedQuarterCat" uid="categoryAxis" type="Dimension" values="Module" />
+            </viz:feeds>
+        </viz:VizFrame>
+    </Panel>
+
+    <Panel id="panelYear" width="25%" class="customKpiCard">
+        <Text id="titleYear" text="Top 3 MFU Templates by&#10;Usage&#10;(by Year)" class="sapUiSmallMarginBottom" />
+        <viz:VizFrame id="chartYear" vizType="column" width="100%" height="200px" uiConfig="{applicationSet:'fiori'}"
+            vizProperties="{ title: { visible: false }, legend: { visible: false }, plotArea: { dataLabel: { visible: true }, colorPalette: ['#3AC582'] } }">
+            <viz:dataset>
+                <viz.data:FlattenedDataset id="dsYear" data="{/YearData}">
+                    <viz.data:dimensions><viz.data:DimensionDefinition id="dimYear" name="Module" value="{Module}" /></viz.data:dimensions>
+                    <viz.data:measures><viz.data:MeasureDefinition id="measYear" name="Usage" value="{Usage}" /></viz.data:measures>
+                </viz.data:FlattenedDataset>
+            </viz:dataset>
+            <viz:feeds>
+                <viz.feeds:FeedItem id="feedYearVal" uid="valueAxis" type="Measure" values="Usage" />
+                <viz.feeds:FeedItem id="feedYearCat" uid="categoryAxis" type="Dimension" values="Module" />
+            </viz:feeds>
+        </viz:VizFrame>
+    </Panel>
+
+</HBox>
+
+<VBox id="tableContainer" class="customKpiCard sapUiSmallMarginBeginEnd sapUiSmallMarginBottom" height="auto">
+    <Title id="tableTitle" text="MFU Details" level="H2" class="sapUiSmallMarginBottom"/>
+    
+    <Table id="detailsTable" items="{/TableData}" class="sapUiSizeCompact">
+        <columns>
+            <Column id="col1"><Text text="MODULE NAME" /></Column>
+            <Column id="col2"><Text text="SUB MODULE NAME" /></Column>
+            <Column id="col3"><Text text="LOAD TYPE" /></Column>
+            <Column id="col4"><Text text="LOAD TEMPLATE" /></Column>
+            <Column id="col5" hAlign="End"><Text text="LOAD COUNT" /></Column>
+        </columns>
+        <items>
+            <ColumnListItem id="itemTemplate">
+                <cells>
+                    <Text text="{moduleName}" />
+                    <Text text="{subModuleName}" />
+                    <Text text="{loadType}" />
+                    <Text text="{loadTemplate}" />
+                    <Text text="{loadCount}" />
+                </cells>
+            </ColumnListItem>
+        </items>
+    </Table>
+</VBox>
+
+
+csssssshshs
+
+jscontroler
+
+
+var oSampleData = {
+    // Top Stacked Chart
+    StackedData: [
+        { Module: "ESG",      approved: 25, pending: 5, uploaded: 1 },
+        { Module: "FINCOST",  approved: 2,  pending: 2, uploaded: 0 },
+        { Module: "ICON",     approved: 6,  pending: 0, uploaded: 0 },
+        { Module: "NFRP",     approved: 22, pending: 2, uploaded: 0 },
+        { Module: "TREASURY", approved: 5,  pending: 0, uploaded: 1 }
+    ],
+    // Bottom Left Pie Chart
+    PieData: [
+        { Module: "ESG", Percentage: 33.85 },
+        { Module: "FINCOST", Percentage: 6.45 },
+        { Module: "ICON", Percentage: 8.63 },
+        { Module: "NFRP", Percentage: 42.66 },
+        { Module: "TREASURY", Percentage: 8.41 }
+    ],
+    // Month Column Chart
+    MonthData: [
+        { Module: "NFRP", Usage: 23 },
+        { Module: "ESG", Usage: 17 },
+        { Module: "ICON", Usage: 2 }
+    ],
+    // Quarter Column Chart
+    QuarterData: [
+        { Module: "ESG", Usage: 31 },
+        { Module: "NFRP", Usage: 24 },
+        { Module: "TREASURY", Usage: 6 }
+    ],
+    // Year Column Chart
+    YearData: [
+        { Module: "ESG", Usage: 31 },
+        { Module: "NFRP", Usage: 24 },
+        { Module: "TREASURY", Usage: 6 }
+    ],
+    // The Bottom Table
+    TableData: [
+        {
+            moduleName: "ESG",
+            subModuleName: "MAPPING_MASTER",
+            loadType: "TRUNCATE",
+            loadTemplate: "MFU_BOOKING_ENTITY_XLATE",
+            loadCount: 1
+        },
+        {
+            moduleName: "ESG",
+            subModuleName: "MAPPING_MASTER",
+            loadType: "TRUNCATE",
+            loadTemplate: "MFU_BUSINESS_INPUT",
+            loadCount: 1
+        }
+    ]
+};
