@@ -1,100 +1,21 @@
-import React, { useState, useEffect } from "react";
-import LandingPage from "./aaaaa/LandingPage";
-import AccountHeader from "./aaaaa/AccountHeader";
-import TransactionHistory from "./aaaaa/TransactionHistory";
-import { getBankAccounts, getBatches, getEmployees } from "./api";
+namespace aspire.finsight;
 
-export default function App() {
-  const [bankAccounts, setBankAccounts] = useState([]);
-  const [batches, setBatches] = useState([]);
-  const [employees, setEmployees] = useState([]);
-  const [selectedAccount, setSelectedAccount] = useState(null);
-  const [currency, setCurrency] = useState("INR");
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+// This creates the physical table in SAP HANA
+entity ModuleSummary {
+    key Module    : String(50);
+    approved      : Integer;
+    pending       : Integer;
+    uploaded      : Integer;
+    percentage    : Decimal(5,2);
+    usageMonth    : Integer;
+    usageQuarter  : Integer;
+    usageYear     : Integer;
+}
 
-  // Fetch all API data
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [bankAccountsData, batchesData, employeesData] = await Promise.all([
-          getBankAccounts(),
-          getBatches(),
-          getEmployees(),
-        ]);
 
-        console.log("Fetched bank accounts:", bankAccountsData);
-        console.log("Fetched batches:", batchesData);
-        console.log("Fetched employees:", employeesData);
+using { aspire.finsight as db } from '../db/schema';
 
-        setBankAccounts(bankAccountsData);
-        setBatches(batchesData);
-        setEmployees(employeesData);
-      } catch (err) {
-        console.error("Failed to fetch data:", err);
-        setError("Failed to load data from server");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-  }, []);
-
-  if (loading)
-    return <div style={{ textAlign: "center", marginTop: "40px" }}>Loading accounts...</div>;
-
-  if (error)
-    return <div style={{ color: "red", textAlign: "center" }}>{error}</div>;
-
-  // 🧩 LandingPage: combine accounts with currency info from batches
-  if (!selectedAccount) {
-    const mergedAccounts = bankAccounts.map((acc) => {
-      const relatedBatch = batches.find((b) => b.debitAccount === acc.accountNumber);
-      return {
-        id: acc.id,
-        name: acc.accountName,
-        accountNumber: acc.accountNumber,
-        balance: acc.balance,
-        currency: relatedBatch?.currency || "USD",
-      };
-    });
-
-    return (
-      <LandingPage
-        profiles={mergedAccounts}
-        onSelectProfile={(acc) => {
-          const actualAccount = bankAccounts.find(
-            (a) => a.accountNumber === acc.accountNumber
-          );
-          setSelectedAccount(actualAccount);
-          setCurrency(acc.currency);
-        }}
-      />
-    );
-  }
-
-  const relatedBatch = batches.find(
-    (b) => b.debitAccount === selectedAccount.accountNumber
-  );
-  const accountCurrency = relatedBatch?.currency || currency;
-
-  return (
-    <div>
-      <AccountHeader
-        name={selectedAccount.accountName}
-        accountNumber={selectedAccount.accountNumber}
-        balance={selectedAccount.balance}
-        currency={accountCurrency}
-        onCurrencyChange={setCurrency}
-      />
-      <TransactionHistory
-        batches={batches}
-        employees={employees}
-        accountBalance={selectedAccount.balance}
-        initialBalance={selectedAccount.initialBalance}
-        currency={accountCurrency}
-      />
-    </div>
-  );
+// This exposes the HANA table as a web service for your UI5 frontend
+service MfuDashboardService {
+    entity ModuleSummary as projection on db.ModuleSummary;
 }
