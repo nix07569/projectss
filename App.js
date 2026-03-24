@@ -1,26 +1,7 @@
-<HBox id="dashboardBottomHalf" width="100%" class="sapUiSmallMarginBottom sapUiSmallMarginBeginEnd flushTopContainer" justifyContent="SpaceBetween">
-    
-    <VBox id="cardPie" width="24%" class="customChartCard">
-        <Text id="pieTitleText" text="MFU Templates by Count" class="kpiTitle sapUiSmallMarginBottom" />
-        <viz:VizFrame id="pieChart" vizType="pie" width="100%" height="220px" uiConfig="{applicationSet:'fiori'}"
-            vizProperties="{ title: { visible: false }, legendGroup: { layout: { position: 'top' } } }">
-            <viz:dataset>
-                <viz.data:FlattenedDataset id="pieDataset" data="{/PieData}">
-                    <viz.data:dimensions><viz.data:DimensionDefinition id="pieDimModule" name="Module" value="{Module}" /></viz.data:dimensions>
-                    <viz.data:measures><viz.data:MeasureDefinition id="pieMeasPerc" name="Percentage" value="{Percentage}" /></viz.data:measures>
-                </viz.data:FlattenedDataset>
-            </viz:dataset>
-            <viz:feeds>
-                <viz.feeds:FeedItem id="pieFeedSize" uid="size" type="Measure" values="Percentage" />
-                <viz.feeds:FeedItem id="pieFeedColor" uid="color" type="Dimension" values="Module" />
-            </viz:feeds>
-        </viz:VizFrame>
-    </VBox>
-
     <VBox id="cardMonth" width="24%" class="customChartCard">
         <Text id="titleMonth" text="Top 3 MFU Templates by&#10;Usage&#10;(by Month)" class="kpiTitle sapUiSmallMarginBottom" />
         <viz:VizFrame id="chartMonth" vizType="column" width="100%" height="220px" uiConfig="{applicationSet:'fiori'}"
-            vizProperties="{ title: { visible: false }, legend: { visible: false }, plotArea: { dataLabel: { visible: true }, colorPalette: ['#42B8D4'] } }">
+            vizProperties="{ title: { visible: false }, legend: { visible: false }, plotArea: { dataLabel: { visible: true }, colorPalette: ['#42B8D4'], dataPointSize: { max: 35 } } }">
             <viz:dataset>
                 <viz.data:FlattenedDataset id="dsMonth" data="{/MonthData}">
                     <viz.data:dimensions><viz.data:DimensionDefinition id="dimMonth" name="Module" value="{Module}" /></viz.data:dimensions>
@@ -37,7 +18,7 @@
     <VBox id="cardQuarter" width="24%" class="customChartCard">
         <Text id="titleQuarter" text="Top 3 MFU Templates by&#10;Usage&#10;(by Quarter)" class="kpiTitle sapUiSmallMarginBottom" />
         <viz:VizFrame id="chartQuarter" vizType="column" width="100%" height="220px" uiConfig="{applicationSet:'fiori'}"
-            vizProperties="{ title: { visible: false }, legend: { visible: false }, plotArea: { dataLabel: { visible: true }, colorPalette: ['#2B4A8E'] } }">
+            vizProperties="{ title: { visible: false }, legend: { visible: false }, plotArea: { dataLabel: { visible: true }, colorPalette: ['#2B4A8E'], dataPointSize: { max: 35 } } }">
             <viz:dataset>
                 <viz.data:FlattenedDataset id="dsQuarter" data="{/QuarterData}">
                     <viz.data:dimensions><viz.data:DimensionDefinition id="dimQuarter" name="Module" value="{Module}" /></viz.data:dimensions>
@@ -54,7 +35,7 @@
     <VBox id="cardYear" width="24%" class="customChartCard">
         <Text id="titleYear" text="Top 3 MFU Templates by&#10;Usage&#10;(by Year)" class="kpiTitle sapUiSmallMarginBottom" />
         <viz:VizFrame id="chartYear" vizType="column" width="100%" height="220px" uiConfig="{applicationSet:'fiori'}"
-            vizProperties="{ title: { visible: false }, legend: { visible: false }, plotArea: { dataLabel: { visible: true }, colorPalette: ['#3AC582'] } }">
+            vizProperties="{ title: { visible: false }, legend: { visible: false }, plotArea: { dataLabel: { visible: true }, colorPalette: ['#3AC582'], dataPointSize: { max: 35 } } }">
             <viz:dataset>
                 <viz.data:FlattenedDataset id="dsYear" data="{/YearData}">
                     <viz.data:dimensions><viz.data:DimensionDefinition id="dimYear" name="Module" value="{Module}" /></viz.data:dimensions>
@@ -67,5 +48,3 @@
             </viz:feeds>
         </viz:VizFrame>
     </VBox>
-
-</HBox>
