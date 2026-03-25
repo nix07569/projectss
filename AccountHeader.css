@@ -6,3 +6,16 @@ VALUES
 ('ICON', 6, 0, 0, 8.63, 2, 0, 0),
 ('NFRP', 22, 2, 0, 42.66, 23, 24, 24),
 ('TREASURY', 5, 0, 1, 8.41, 0, 6, 6);
+
+
+CREATE VIEW "T1GDTL_PHY"."PROJECTS_MODULESUMMARY" AS 
+SELECT 
+    "MODULE" AS "Module",
+    "APPROVED" AS "approved",
+    "PENDING" AS "pending",
+    "UPLOADED" AS "uploaded",
+    "PERCENTAGE" AS "percentage",
+    "USAGEMONTH" AS "usageMonth",
+    "USAGEQUARTER" AS "usageQuarter",
+    "USAGEYEAR" AS "usageYear"
+FROM "T1GDTL_PHY"."MY_SAMPLE_MODULESUMMARY";
