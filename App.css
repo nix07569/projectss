@@ -1,6 +1,159 @@
+<mvc:View
+    controllerName="project1.controller.View1"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns:core="sap.ui.core"
+    xmlns="sap.m"
+    xmlns:f="sap.f"
+    xmlns:w="sap.ui.integration.widgets"
+    displayBlock="true">
+
+    <f:DynamicPage id="page" headerExpanded="true" fitContent="true">
+        
+        <f:title>
+            <f:DynamicPageTitle id="dynamicPageTitle">
+                
+                <f:heading>
+                    <VBox id="headerLayoutWrapper">
+                        <HBox id="logoRow" alignItems="Center" class="sapUiSmallMarginBottom">
+                            <Button id="btnMenu" icon="sap-icon://menu2" type="Transparent" class="sapUiTinyMarginRight" />
+                            <Image id="imgLogo" src="./images/finsight_logo.png" height="35px" fallbackIcon="sap-icon://building" />
+                        </HBox>
+
+                        <HBox id="titleRow" alignItems="Center">
+                            <core:Icon id="iconFilter" src="sap-icon://filter" size="1.8rem" color="#0064d9" class="sapUiSmallMarginRight" />
+                            <Title id="mainHeadingTitle" text="{pageState>/selectedOrg} | Financials {pageState>/selectedView}" level="H2" />
+                        </HBox>
+                    </VBox>
+                </f:heading>
+                
+                <f:actions>
+                    <SegmentedButton id="orgToggle" selectedKey="{pageState>/selectedOrg}" selectionChange=".onToggleChange">
+                        <items>
+                            <SegmentedButtonItem id="btnGroup" key="Group" text="Group" />
+                            <SegmentedButtonItem id="btnCIB" key="CIB" text="CIB" />
+                            <SegmentedButtonItem id="btnWRB" key="WRB" text="WRB" />
+                        </items>
+                    </SegmentedButton>
+
+                    <SegmentedButton id="viewToggle" selectedKey="{pageState>/selectedView}" selectionChange=".onToggleChange">
+                        <items>
+                            <SegmentedButtonItem id="btnOverview" key="Overview" text="Overview" />
+                            <SegmentedButtonItem id="btnTrends" key="Trends" text="Trends" />
+                        </items>
+                    </SegmentedButton>
+
+                    <SegmentedButton id="scaleToggle" selectedKey="{pageState>/selectedScale}" selectionChange=".onToggleChange">
+                        <items>
+                            <SegmentedButtonItem id="btnScaleM" key="m" text="$m" />
+                            <SegmentedButtonItem id="btnScaleBn" key="bn" text="$bn" />
+                        </items>
+                    </SegmentedButton>
+                </f:actions>
+
+            </f:DynamicPageTitle>
+        </f:title>
+
+        <f:content>
+            <VBox id="mainContentWrapper" width="100%">
+                
+                <f:GridContainer 
+                    id="overviewContainer" 
+                    visible="{= ${pageState>/selectedView} === 'Overview' }"
+                    snapToRow="true">
+                    
+                    <f:layout>
+                        <f:GridContainerSettings id="defaultGridSettings" rowSize="5rem" columnSize="16%" gap="1rem" />
+                    </f:layout>
+                    
+                    <f:items>
+                        <w:Card id="cardIncome" class="flatTransparentCard" manifest="../cards/income/manifest.json" parameters="{ 'org': '{pageState>/selectedOrg}' }">
+                            <w:layoutData><f:GridContainerItemLayoutData id="lytIncome" columns="1" rows="3" /></w:layoutData>
+                        </w:Card>
+                        <w:Card id="cardNii" class="flatTransparentCard" manifest="../cards/nii/manifest.json" parameters="{ 'org': '{pageState>/selectedOrg}' }">
+                            <w:layoutData><f:GridContainerItemLayoutData id="lytNii" columns="1" rows="3" /></w:layoutData>
+                        </w:Card>
+                        <w:Card id="cardCosts" class="flatTransparentCard" manifest="../cards/costs/manifest.json" parameters="{ 'org': '{pageState>/selectedOrg}' }">
+                            <w:layoutData><f:GridContainerItemLayoutData id="lytCosts" columns="1" rows="3" /></w:layoutData>
+                        </w:Card>
+                        <w:Card id="cardImpairments" class="flatTransparentCard" manifest="../cards/impairments/manifest.json" parameters="{ 'org': '{pageState>/selectedOrg}' }">
+                            <w:layoutData><f:GridContainerItemLayoutData id="lytImpairments" columns="1" rows="3" /></w:layoutData>
+                        </w:Card>
+                        <w:Card id="cardProfit" class="flatTransparentCard" manifest="../cards/profit/manifest.json" parameters="{ 'org': '{pageState>/selectedOrg}' }">
+                            <w:layoutData><f:GridContainerItemLayoutData id="lytProfit" columns="1" rows="3" /></w:layoutData>
+                        </w:Card>
+                        <w:Card id="cardRote" class="flatTransparentCard" manifest="../cards/rote/manifest.json" parameters="{ 'org': '{pageState>/selectedOrg}' }">
+                            <w:layoutData><f:GridContainerItemLayoutData id="lytRote" columns="1" rows="3" /></w:layoutData>
+                        </w:Card>
+
+                        <w:Card id="cardJaws" class="flatTransparentCard" manifest="../cards/jaws/manifest.json" parameters="{ 'org': '{pageState>/selectedOrg}' }">
+                            <w:layoutData><f:GridContainerItemLayoutData id="lytJaws" columns="1" rows="3" /></w:layoutData>
+                        </w:Card>
+                        <w:Card id="cardCir" class="flatTransparentCard" manifest="../cards/cir/manifest.json" parameters="{ 'org': '{pageState>/selectedOrg}' }">
+                            <w:layoutData><f:GridContainerItemLayoutData id="lytCir" columns="1" rows="3" /></w:layoutData>
+                        </w:Card>
+                        <w:Card id="cardHeadcount" class="flatTransparentCard" manifest="../cards/headcount/manifest.json" parameters="{ 'org': '{pageState>/selectedOrg}' }">
+                            <w:layoutData><f:GridContainerItemLayoutData id="lytHeadcount" columns="1" rows="3" /></w:layoutData>
+                        </w:Card>
+                        <w:Card id="cardFundedAssets" class="flatTransparentCard" manifest="../cards/fundedAssets/manifest.json" parameters="{ 'org': '{pageState>/selectedOrg}' }">
+                            <w:layoutData><f:GridContainerItemLayoutData id="lytFundedAssets" columns="1" rows="3" /></w:layoutData>
+                        </w:Card>
+                        <w:Card id="cardRwa" class="flatTransparentCard" manifest="../cards/rwa/manifest.json" parameters="{ 'org': '{pageState>/selectedOrg}' }">
+                            <w:layoutData><f:GridContainerItemLayoutData id="lytRwa" columns="1" rows="3" /></w:layoutData>
+                        </w:Card>
+                        <w:Card id="cardRwaSecondary" class="flatTransparentCard" manifest="../cards/rwasecondary/manifest.json" parameters="{ 'org': '{pageState>/selectedOrg}' }">
+                            <w:layoutData><f:GridContainerItemLayoutData id="lytRwaSecondary" columns="1" rows="3" /></w:layoutData>
+                        </w:Card>
+                    </f:items>
+                </f:GridContainer>
+
+                <VBox id="trendsContainer" visible="{= ${pageState>/selectedView} === 'Trends' }" alignItems="Center" justifyContent="Center" height="400px">
+                    <IllustratedMessage id="illusTrends" illustrationType="sapIllus-EmptyList" title="Trends Data" description="Trends reference will be added later." />
+                </VBox>
+
+            </VBox>
+        </f:content>
+    </f:DynamicPage>
+</mvc:View>
+
+
+controller
+
+sap.ui.define([
+    "sap/ui/core/mvc/Controller",
+    "sap/ui/model/json/JSONModel",
+    "sap/m/MessageToast"
+], function (Controller, JSONModel, MessageToast) {
+    "use strict";
+
+    return Controller.extend("project1.controller.View1", {
+        onInit: function () {
+            var oStateData = {
+                selectedOrg: "CIB",
+                selectedView: "Overview",
+                selectedScale: "m"
+            };
+
+            var oStateModel = new JSONModel(oStateData);
+            this.getView().setModel(oStateModel, "pageState");
+        },
+
+        onToggleChange: function(oEvent) {
+            var oModel = this.getView().getModel("pageState");
+            var sOrg = oModel.getProperty("/selectedOrg");
+            var sView = oModel.getProperty("/selectedView");
+            
+            // Provides brief feedback; Cards update automatically via binding
+            MessageToast.show("Switched to " + sOrg + " | " + sView);
+        }
+    });
+});
+
+
+manifest
+
 {
   "sap.app": {
-    "id": "my.app.cards.kpiTemplate",
+    "id": "my.app.cards.kpiCard",
     "type": "card"
   },
   "sap.card": {
@@ -21,30 +174,41 @@
       "title": "{title}",
       "mainIndicator": {
         "number": "{mainValue}",
-        "unit": "{mainTrend}"
+        "unit": "{mainTrend}",
+        "state": "{trendColor}"
       },
       "details": "{mainSubtitle}"
     },
     "content": {
       "data": {
-        "path": "listData"
+        "path": "/{{parameters.org}}/listData"
       },
       "item": {
-        "title": "{label}",
-        "info": {
-          "value": "{value}"
-        }
+        "columns": [
+          {
+            "value": "{label}"
+          },
+          {
+            "value": "{value}",
+            "hAlign": "End"
+          }
+        ]
       }
     }
   }
 }
 
 
-{
+
+mock datat
+
+
+      {
   "Group": {
     "title": "Income",
     "mainValue": "28.50",
     "mainTrend": "(14.20%)",
+    "trendColor": "Success",
     "mainSubtitle": "YTD Actuals (YoY %)",
     "listData": [
       { "label": "Vs Budget", "value": "4.20" },
@@ -56,17 +220,19 @@
     "title": "Income",
     "mainValue": "9.01",
     "mainTrend": "(11.46%)",
+    "trendColor": "Success",
     "mainSubtitle": "YTD Actuals (YoY %)",
     "listData": [
       { "label": "Vs Budget", "value": "1.85" },
       { "label": "PQTD Actuals (YoY %)", "value": "3.47 (17.92%)" },
-      { "label": "PY Outlook (YoY %)", "value": "12.19 ()" }
+      { "label": "FY Outlook (YoY %)", "value": "12.19 ( )" }
     ]
   },
   "WRB": {
     "title": "Income",
     "mainValue": "14.22",
     "mainTrend": "(-2.10%)",
+    "trendColor": "Error",
     "mainSubtitle": "YTD Actuals (YoY %)",
     "listData": [
       { "label": "Vs Budget", "value": "-0.50" },
@@ -77,22 +243,24 @@
 }
 
 
-<f:GridContainer id="overviewContainer" snapToRow="true">
-    <f:layout>
-        <f:GridContainerSettings id="gridSettings" rowSize="5rem" columnSize="16%" gap="1rem" />
-    </f:layout>
-    <f:items>
-        
-        <w:Card 
-            id="cardIncome"
-            manifest="../cards/income/manifest.json" 
-            parameters="{ 'org': '{pageState>/selectedOrg}' }">
-            <w:layoutData>
-                <f:GridContainerItemLayoutData id="lytInc" columns="1" rows="4" />
-            </w:layoutData>
-        </w:Card>
+       css
+    /* Make Integration Cards completely flat and transparent */
+.flatTransparentCard,
+.flatTransparentCard .sapFCard {
+    background: transparent !important;
+    background-color: transparent !important;
+    box-shadow: none !important;
+    border: none !important;
+}
 
-        </f:items>
-</f:GridContainer>
+/* Remove the default padding to tighten up the floating text */
+.flatTransparentCard .sapFCardHeader {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    padding-top: 0.5rem !important;
+}
 
-          
+.flatTransparentCard .sapFCardContent {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+}
