@@ -1,23 +1,98 @@
-package com.example.banking.service;
-
-import com.example.banking.model.Account;
-import com.example.banking.repository.AccountRepository;
-import org.springframework.stereotype.Service;
-import java.util.List;
-
-@Service
-public class AccountService {
-    private final AccountRepository repo;
-
-    public AccountService(AccountRepository repo) {
-        this.repo = repo;
+{
+  "sap.app": {
+    "id": "my.app.cards.kpiTemplate",
+    "type": "card"
+  },
+  "sap.card": {
+    "type": "List",
+    "configuration": {
+      "parameters": {
+        "org": {"value": "CIB"}
+      }
+    },
+    "data": {
+      "request": {
+        "url": "./mockData.json"
+      },
+      "path": "/{{parameters.org}}"
+    },
+    "header": {
+      "type": "Numeric",
+      "title": "{title}",
+      "mainIndicator": {
+        "number": "{mainValue}",
+        "unit": "{mainTrend}"
+      },
+      "details": "{mainSubtitle}"
+    },
+    "content": {
+      "data": {
+        "path": "listData"
+      },
+      "item": {
+        "title": "{label}",
+        "info": {
+          "value": "{value}"
+        }
+      }
     }
-
-    public List<Account> getAllAccounts() {
-        return repo.findAll();
-    }
-
-    public Account getAccountById(Long id) {
-        return repo.findById(id).orElse(null);
-    }
+  }
 }
+
+
+{
+  "Group": {
+    "title": "Income",
+    "mainValue": "28.50",
+    "mainTrend": "(14.20%)",
+    "mainSubtitle": "YTD Actuals (YoY %)",
+    "listData": [
+      { "label": "Vs Budget", "value": "4.20" },
+      { "label": "PQTD Actuals (YoY %)", "value": "8.15 (12.4%)" },
+      { "label": "PY Outlook (YoY %)", "value": "29.10 (8%)" }
+    ]
+  },
+  "CIB": {
+    "title": "Income",
+    "mainValue": "9.01",
+    "mainTrend": "(11.46%)",
+    "mainSubtitle": "YTD Actuals (YoY %)",
+    "listData": [
+      { "label": "Vs Budget", "value": "1.85" },
+      { "label": "PQTD Actuals (YoY %)", "value": "3.47 (17.92%)" },
+      { "label": "PY Outlook (YoY %)", "value": "12.19 ()" }
+    ]
+  },
+  "WRB": {
+    "title": "Income",
+    "mainValue": "14.22",
+    "mainTrend": "(-2.10%)",
+    "mainSubtitle": "YTD Actuals (YoY %)",
+    "listData": [
+      { "label": "Vs Budget", "value": "-0.50" },
+      { "label": "PQTD Actuals (YoY %)", "value": "4.12 (-1.2%)" },
+      { "label": "PY Outlook (YoY %)", "value": "15.00 (2%)" }
+    ]
+  }
+}
+
+
+<f:GridContainer id="overviewContainer" snapToRow="true">
+    <f:layout>
+        <f:GridContainerSettings id="gridSettings" rowSize="5rem" columnSize="16%" gap="1rem" />
+    </f:layout>
+    <f:items>
+        
+        <w:Card 
+            id="cardIncome"
+            manifest="../cards/income/manifest.json" 
+            parameters="{ 'org': '{pageState>/selectedOrg}' }">
+            <w:layoutData>
+                <f:GridContainerItemLayoutData id="lytInc" columns="1" rows="4" />
+            </w:layoutData>
+        </w:Card>
+
+        </f:items>
+</f:GridContainer>
+
+          
