@@ -1,35 +1,88 @@
-// AccountHeader.js
-import React from "react";
-import "./AccountHeader.css";
+<mvc:View
+    controllerName="my.app.controller.Dashboard"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns:f="sap.f"
+    xmlns:w="sap.ui.integration.widgets"
+    displayBlock="true">
+    
+    <f:ShellBar title="CIB | Financials Overview" />
 
-const currencies = [
-  { code: "INR", symbol: "₹" },
-  { code: "USD", symbol: "$" },
-];
+    <f:GridContainer id="demoGrid" snapToRow="true">
+        <f:layout>
+            <f:GridContainerSettings rowSize="80px" columnSize="120px" gap="1rem" />
+        </f:layout>
+        <f:items>
+            <w:Card manifest="./cards/income/manifest.json" width="300px">
+                <w:layoutData>
+                    <f:GridContainerItemLayoutData columns="3" rows="4" />
+                </w:layoutData>
+            </w:Card>
 
-function AccountHeader({ name, accountNumber, balance, currency, onCurrencyChange }) {
-  // ✅ Get currency symbol directly (no conversion)
-  const getCurrencySymbol = (code) =>
-    currencies.find((c) => c.code === code)?.symbol || "";
+            <w:Card manifest="./cards/nii/manifest.json" width="300px">
+                <w:layoutData>
+                    <f:GridContainerItemLayoutData columns="3" rows="4" />
+                </w:layoutData>
+            </w:Card>
 
-  return (
-    <div className="account-header-root">
-      <div>
-        <h2>{name}</h2>
-        <div className="account-header-accnum">{accountNumber}</div>
-      </div>
+            <w:Card manifest="./cards/costs/manifest.json" width="300px">
+                <w:layoutData>
+                    <f:GridContainerItemLayoutData columns="3" rows="4" />
+                </w:layoutData>
+            </w:Card>
+        </f:items>
+    </f:GridContainer>
+</mvc:View>
 
-      <div className="account-header-balance-section">
-        <span className="account-header-balance-amount">
-          {getCurrencySymbol(currency)}
-          {Number(balance).toLocaleString(undefined, {
-            minimumFractionDigits: 2,
-          })}
-        </span>
 
-      </div>
-    </div>
-  );
+
+
+manifest . jason
+
+
+{
+  "sap.app": {
+    "id": "my.app.cards.income",
+    "type": "card"
+  },
+  "sap.card": {
+    "type": "Analytical",
+    "header": {
+      "type": "Numeric",
+      "title": "Income",
+      "subTitle": "YTD Actuals",
+      "unitOfMeasurement": "B",
+      "mainIndicator": {
+        "number": "{/mainKpi}",
+        "unit": "B",
+        "trend": "{/trend}",
+        "state": "{/state}"
+      },
+      "details": "Vs Budget: {/budgetDiff}%"
+    },
+    "content": {
+      "chartAttributes": {
+        "chartType": "Line",
+        "data": {
+          "request": {
+            "url": "/destinations/myBackend/ODataService/Financials",
+            "parameters": {
+              "$select": "Date,Amount",
+              "$filter": "Category eq 'Income'",
+              "$top": "12"
+            }
+          },
+          "path": "/value"
+        },
+        "dimensions": [{
+          "label": "Month",
+          "value": "{Date}"
+        }],
+        "measures": [{
+          "label": "Income",
+          "value": "{Amount}"
+        }]
+      }
+    }
+  }
 }
 
-export default AccountHeader;
