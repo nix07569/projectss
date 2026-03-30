@@ -1,12 +1,12 @@
 <mvc:View
-    controllerName="my.app.controller.Dashboard"
+    controllerName="project1.controller.View1"
     xmlns:mvc="sap.ui.core.mvc"
     xmlns="sap.m"
     xmlns:f="sap.f"
     xmlns:w="sap.ui.integration.widgets"
     displayBlock="true">
 
-    <f:DynamicPage id="page" headerExpanded="true">
+    <f:DynamicPage id="page" headerExpanded="true" fitContent="true">
         
         <f:title>
             <f:DynamicPageTitle>
@@ -41,37 +41,86 @@
         </f:title>
 
         <f:content>
-            <f:GridContainer 
-                id="overviewContainer" 
-                visible="{= ${pageState>/selectedView} === 'Overview' }"
-                snapToRow="true">
-                <f:layout>
-                    <f:GridContainerSettings rowSize="80px" columnSize="16%" gap="1rem" />
-                </f:layout>
-                <f:items>
-                    <w:Card manifest="./cards/income/manifest.json" parameters="{
-                        'org': '{pageState>/selectedOrg}', 
-                        'scale': '{pageState>/selectedScale}'
-                    }">
-                        <w:layoutData><f:GridContainerItemLayoutData id="lytInc" columns="1" rows="3" /></w:layoutData>
-                    </w:Card>
+            <VBox id="mainContentWrapper" width="100%">
+                
+                <f:GridContainer 
+                    id="overviewContainer" 
+                    visible="{= ${pageState>/selectedView} === 'Overview' }"
+                    snapToRow="true">
+                    
+                    <f:layout>
+                        <f:GridContainerSettings id="defaultGridSettings" rowSize="80px" columnSize="16%" gap="1rem" />
+                    </f:layout>
+                    
+                    <f:items>
+                        <w:Card 
+                            id="cardIncome"
+                            manifest="./cards/income/manifest.json" 
+                            parameters="{ 'org': '{pageState>/selectedOrg}', 'scale': '{pageState>/selectedScale}' }">
+                            <w:layoutData>
+                                <f:GridContainerItemLayoutData id="lytInc" columns="1" rows="3" />
+                            </w:layoutData>
+                        </w:Card>
 
-                    </f:items>
-            </f:GridContainer>
+                        </f:items>
+                </f:GridContainer>
 
-            <VBox 
-                id="trendsContainer" 
-                visible="{= ${pageState>/selectedView} === 'Trends' }"
-                alignItems="Center" 
-                justifyContent="Center">
-                <IllustratedMessage illustrationType="sapIllus-EmptyList" title="Trends Data" description="Trends reference will be added later." />
+                <VBox 
+                    id="trendsContainer" 
+                    visible="{= ${pageState>/selectedView} === 'Trends' }"
+                    alignItems="Center" 
+                    justifyContent="Center"
+                    height="400px">
+                    <IllustratedMessage illustrationType="sapIllus-EmptyList" title="Trends Data" description="Trends reference will be added later." />
+                </VBox>
+
             </VBox>
         </f:content>
     </f:DynamicPage>
 </mvc:View>
 
 
-MANIFEST.JASON
+controller....
+
+sap.ui.define([
+    "sap/ui/core/mvc/Controller",
+    "sap/ui/model/json/JSONModel",
+    "sap/m/MessageToast"
+], function (Controller, JSONModel, MessageToast) {
+    "use strict";
+
+    return Controller.extend("project1.controller.View1", {
+        onInit: function () {
+            // 1. Define the default state of the dashboard
+            var oStateData = {
+                selectedOrg: "CIB",      // Options: Group, CIB, WRB
+                selectedView: "Overview", // Options: Overview, Trends
+                selectedScale: "m"        // Options: m, bn
+            };
+
+            // 2. Bind it to the view so the UI and Cards can react to it
+            var oStateModel = new JSONModel(oStateData);
+            this.getView().setModel(oStateModel, "pageState");
+        },
+
+        onToggleChange: function(oEvent) {
+            // Fetch the newly selected values
+            var oModel = this.getView().getModel("pageState");
+            var sOrg = oModel.getProperty("/selectedOrg");
+            var sView = oModel.getProperty("/selectedView");
+
+            // Optional: Provide visual feedback (The cards will update automatically)
+            MessageToast.show("Switched to " + sOrg + " | " + sView);
+            
+            // Note: Because the Integration Cards have their parameters bound to this model,
+            // they will automatically detect this change and re-fetch their data/titles.
+        }
+    });
+});
+
+
+manifest.json
+
 
 {
   "sap.app": {
@@ -88,49 +137,49 @@ MANIFEST.JASON
     },
     "data": {
       "request": {
-        "url": "./sampleData/incomeData.json",
-        "parameters": {
-          "organization": "{{parameters.org}}",
-          "dataScale": "{{parameters.scale}}"
-        }
-      }
+        "url": "./cards/income/mockData.json"
+      },
+      "path": "/{{parameters.org}}"
     },
     "header": {
       "type": "Numeric",
-      "title": "Income",
+      "title": "Income ({{parameters.org}})",
+      "subTitle": "YTD Actuals",
       "mainIndicator": {
-        "number": "{/totalIncome}",
+        "number": "{total}",
         "unit": "{{parameters.scale}}"
-      }
+      },
+      "details": "Vs Budget: {budgetDiff}%"
+    },
+    "content": {
+      "chartType": "Line",
+      "dimensions": [{"label": "Month", "value": "{Month}"}],
+      "measures": [{"label": "Income", "value": "{Amount}"}]
     }
   }
 }
 
-CONTROLLER
 
-// Dashboard.controller.js
-sap.ui.define([
-    "sap/ui/core/mvc/Controller",
-    "sap/ui/model/json/JSONModel"
-], function (Controller, JSONModel) {
-    "use strict";
+mock data
 
-    return Controller.extend("my.app.controller.Dashboard", {
-        onInit: function () {
-            // Initialize the frontend state model
-            var oStateModel = new JSONModel({
-                selectedOrg: "CIB",      // Group, CIB, WRB
-                selectedView: "Overview", // Overview, Trends
-                selectedScale: "m"        // m, bn
-            });
-            this.getView().setModel(oStateModel, "pageState");
-        },
+{
+    "Group": {
+        "total": "28.50",
+        "budgetDiff": "+4.2",
+        "Month": "Dec",
+        "Amount": "2.8"
+    },
+    "CIB": {
+        "total": "9.01",
+        "budgetDiff": "+1.85",
+        "Month": "Dec",
+        "Amount": "1.2"
+    },
+    "WRB": {
+        "total": "14.22",
+        "budgetDiff": "-0.5",
+        "Month": "Dec",
+        "Amount": "1.5"
+    }
+}
 
-        onToggleChange: function(oEvent) {
-            // The Integration Cards will automatically detect changes to this model
-            // and refresh their sample data/frontend logic accordingly.
-            sap.m.MessageToast.show("Data updated for: " + 
-                this.getView().getModel("pageState").getProperty("/selectedOrg"));
-        }
-    });
-});
