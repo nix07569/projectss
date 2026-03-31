@@ -1,96 +1,48 @@
-<VBox class="customKpiCard sapUiSmallMargin">
-    
-    <Title text="Impairments" class="kpiCardTitle sapUiMediumMarginBottom" />
+sap.ui.define([
+    "sap/ui/core/mvc/Controller",
+    "sap/ui/model/json/JSONModel"
+], function (Controller, JSONModel) {
+    "use strict";
 
-    <VBox class="sapUiMediumMarginBottom">
-        <HBox alignItems="Baseline" class="sapUiTinyMarginBottom">
-            <Text text="-0.01" class="primaryKpiValue sapUiTinyMarginEnd" />
-            <Text text="(166.16%)" class="negativePercentText primaryKpiPercent" />
-        </HBox>
-        <Text text="YTD Actuals (YoY %)" class="kpiSubLabel" />
-    </VBox>
+    return Controller.extend("your.namespace.controller.Main", {
+        onInit: function () {
+            // Set default state: Group and Overview are selected on load
+            var oStateData = {
+                selectedPage: "Group",       
+                selectedSubPage: "Overview"  
+            };
+            
+            var oViewModel = new JSONModel(oStateData);
+            this.getView().setModel(oViewModel, "view");
+        },
 
-    <VBox width="100%">
-        <HBox justifyContent="SpaceBetween" class="sapUiTinyMarginBottom">
-            <Text text="Vs. Budget" class="kpiSubLabel" />
-            <Text text="0.27" class="secondaryKpiValue" />
-        </HBox>
-        
-        <HBox justifyContent="SpaceBetween" class="sapUiTinyMarginBottom">
-            <Text text="CY PQ Actuals (YoY %)" class="kpiSubLabel" />
-            <HBox alignItems="Baseline">
-                <Text text="-0.04" class="secondaryKpiValue sapUiTinyMarginEnd" />
-                <Text text="(138.54%)" class="negativePercentText secondaryKpiPercent" />
-            </HBox>
-        </HBox>
-        
-        <HBox justifyContent="SpaceBetween">
-            <Text text="FY Outlook (YoY %)" class="kpiSubLabel" />
-            <HBox alignItems="Baseline">
-                <Text text="0.28" class="secondaryKpiValue sapUiTinyMarginEnd" />
-                <Text text="(11,409.84%)" class="negativePercentText secondaryKpiPercent" />
-            </HBox>
-        </HBox>
-    </VBox>
-    
-</VBox>
+        // Triggered when Group, CIB, or WRB is clicked
+        onPageSelect: function (oEvent) {
+            var sSelectedPage = oEvent.getSource().getText(); 
+            this.getView().getModel("view").setProperty("/selectedPage", sSelectedPage);
+        },
 
-/* Card Container */
-.customKpiCard {
-    background-color: #ffffff;
-    border: 1px solid #e5e5e5;
-    border-radius: 6px;
-    padding: 1.5rem;
-    width: 320px; /* Adjust width based on your grid/layout needs */
-    box-shadow: 0 1px 2px rgba(0,0,0,0.05); /* Optional subtle shadow */
-}
+        // Triggered when Overview or Trends is clicked
+        onSubPageSelect: function (oEvent) {
+            var sSelectedSubPage = oEvent.getSource().getText();
+            this.getView().getModel("view").setProperty("/selectedSubPage", sSelectedSubPage);
+        },
 
-/* Header Title */
-.kpiCardTitle {
-    color: #333333;
-    font-size: 1rem !important;
-    font-weight: 700 !important;
-}
-
-/* Primary KPI Values */
-.primaryKpiValue {
-    color: #333333;
-    font-size: 1.5rem;
-    font-weight: 700;
-}
-
-.primaryKpiPercent {
-    font-size: 1rem;
-    font-weight: 400;
-}
-
-/* Secondary/Footer KPI Values */
-.secondaryKpiValue {
-    color: #333333;
-    font-size: 0.75rem;
-    font-weight: 700;
-}
-
-.secondaryKpiPercent {
-    font-size: 0.75rem;
-    font-weight: 400;
-}
-
-/* Shared Utility Classes */
-.kpiSubLabel {
-    color: #888888; /* Light gray text from the screenshot */
-    font-size: 0.75rem;
-    font-weight: 400;
-}
-
-.negativePercentText {
-    color: #d32030; /* Fiori standard negative semantic color (red) */
-}
-
-/* If you have positive values in other cards, you can use this */
-.positivePercentText {
-    color: #2b7c2b; /* Fiori standard positive semantic color (green) */
-}
-
-
-
+        // Triggered when clicking the custom $m/$bn or RFX/CFX buttons
+        onCustomToggleClick: function (oEvent) {
+            var oClickedItem = oEvent.getSource();
+            var oParentBox = oClickedItem.getParent();
+            
+            // Remove 'customToggleActive' from both buttons in that specific row
+            var aItems = oParentBox.getItems();
+            aItems.forEach(function(oItem) {
+                oItem.removeStyleClass("customToggleActive");
+            });
+            
+            // Add 'customToggleActive' to the one just clicked
+            oClickedItem.addStyleClass("customToggleActive");
+            
+            // Optional: var sSelectedValue = oClickedItem.getText(); to trigger data reloads
+        }
+    });
+});
