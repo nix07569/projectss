@@ -1,48 +1,156 @@
-sap.ui.define([
-    "sap/ui/core/mvc/Controller",
-    "sap/ui/model/json/JSONModel"
-], function (Controller, JSONModel) {
-    "use strict";
+fragments
 
-    return Controller.extend("your.namespace.controller.Main", {
+<core:FragmentDefinition 
+    xmlns="sap.m" 
+    xmlns:core="sap.ui.core">
+    
+    <VBox class="customKpiCard sapUiSmallMarginEnd sapUiSmallMarginBottom">
+        
+        <Title text="{view>title}" class="kpiCardTitle sapUiSmallMarginBottom" />
+
+        <VBox class="cardInfo sapUiSmallMarginBottom">
+            <HBox class="cardValue" justifyContent="SpaceBetween" alignItems="Baseline">
+                <Text text="{view>mainValue}" class="primaryKpiValue sapUiTinyMarginEnd" />
+                <Text text="{view>mainPercent}" class="{view>mainClass} primaryKpiPercent" />
+            </HBox>
+            <Text text="{view>mainLabel}" class="kpiSubLabel" />
+        </VBox>
+
+        <VBox class="impairmentsBottom" width="100%">
+            <HBox justifyContent="SpaceBetween" class="tightrow" visible="{= !!${view>row1Key} }">
+                <Text text="{view>row1Key}" class="kpiSubLabel" />
+                <Text text="{view>row1Value}" class="secondaryKpiValue" />
+            </HBox>
+            
+            <HBox justifyContent="SpaceBetween" class="tightrow" visible="{= !!${view>row2Key} }">
+                <Text text="{view>row2Key}" class="kpiSubLabel" />
+                <HBox alignItems="Baseline">
+                    <Text text="{view>row2Value}" class="secondaryKpiValue sapUiTinyMarginEnd" />
+                    <Text text="{view>row2Percent}" class="{view>row2Class} secondaryKpiPercent" />
+                </HBox>
+            </HBox>
+            
+            <HBox justifyContent="SpaceBetween" class="tightrow" visible="{= !!${view>row3Key} }">
+                <Text text="{view>row3Key}" class="kpiSubLabel" />
+                <HBox alignItems="Baseline">
+                    <Text text="{view>row3Value}" class="secondaryKpiValue sapUiTinyMarginEnd" />
+                    <Text text="{view>row3Percent}" class="{view>row3Class} secondaryKpiPercent" />
+                </HBox>
+            </HBox>
+        </VBox>
+        
+    </VBox>
+</core:FragmentDefinition>
+
+
+
+
         onInit: function () {
-            // Set default state: Group and Overview are selected on load
             var oStateData = {
                 selectedPage: "Group",       
-                selectedSubPage: "Overview"  
+                selectedSubPage: "Overview", 
+                
+                // Array of 12 Cards
+                kpiData: [
+                    {
+                        title: "Impairments",
+                        mainValue: "-0.01",
+                        mainPercent: "(166.16%)",
+                        mainClass: "negativePercentText", // Turns it Red
+                        mainLabel: "YTD Actuals (YoY %)",
+                        
+                        row1Key: "Vs. Budget",
+                        row1Value: "0.27",
+                        
+                        row2Key: "CY PQ Actuals (YoY %)",
+                        row2Value: "-0.04",
+                        row2Percent: "(138.54%)",
+                        row2Class: "negativePercentText",
+                        
+                        row3Key: "FY Outlook (YoY %)",
+                        row3Value: "0.28",
+                        row3Percent: "(11,409.84%)",
+                        row3Class: "positivePercentText" // Turns it Green
+                    },
+                    {
+                        title: "Underlying Profit",
+                        mainValue: "4.60",
+                        mainPercent: "(12.5%)",
+                        mainClass: "positivePercentText", 
+                        mainLabel: "YTD Actuals (YoY %)",
+                        
+                        row1Key: "Vs. Budget",
+                        row1Value: "0.50",
+                        
+                        row2Key: "CY PQ Actuals (YoY %)",
+                        row2Value: "1.20",
+                        row2Percent: "(5.1%)",
+                        row2Class: "positivePercentText",
+                        
+                        row3Key: "FY Outlook (YoY %)",
+                        row3Value: "5.10",
+                        row3Percent: "(10.0%)",
+                        row3Class: "positivePercentText"
+                    },
+                    {
+                        title: "Operating Expenses",
+                        mainValue: "1.20",
+                        mainPercent: "(2.1%)",
+                        mainClass: "negativePercentText", 
+                        mainLabel: "YTD Actuals (YoY %)",
+                        
+                        row1Key: "Vs. Budget",
+                        row1Value: "-0.15",
+                        
+                        row2Key: "CY PQ Actuals (YoY %)",
+                        row2Value: "0.80",
+                        row2Percent: "(1.5%)",
+                        row2Class: "negativePercentText",
+                        
+                        row3Key: "FY Outlook (YoY %)",
+                        row3Value: "1.50",
+                        row3Percent: "(3.2%)",
+                        row3Class: "negativePercentText"
+                    }
+                    // ... Add 9 more card objects here!
+                ]
             };
             
-            var oViewModel = new JSONModel(oStateData);
+            var oViewModel = new sap.ui.model.json.JSONModel(oStateData);
             this.getView().setModel(oViewModel, "view");
-        },
-
-        // Triggered when Group, CIB, or WRB is clicked
-        onPageSelect: function (oEvent) {
-            var sSelectedPage = oEvent.getSource().getText(); 
-            this.getView().getModel("view").setProperty("/selectedPage", sSelectedPage);
-        },
-
-        // Triggered when Overview or Trends is clicked
-        onSubPageSelect: function (oEvent) {
-            var sSelectedSubPage = oEvent.getSource().getText();
-            this.getView().getModel("view").setProperty("/selectedSubPage", sSelectedSubPage);
-        },
-
-        // Triggered when clicking the custom $m/$bn or RFX/CFX buttons
-        onCustomToggleClick: function (oEvent) {
-            var oClickedItem = oEvent.getSource();
-            var oParentBox = oClickedItem.getParent();
-            
-            // Remove 'customToggleActive' from both buttons in that specific row
-            var aItems = oParentBox.getItems();
-            aItems.forEach(function(oItem) {
-                oItem.removeStyleClass("customToggleActive");
-            });
-            
-            // Add 'customToggleActive' to the one just clicked
-            oClickedItem.addStyleClass("customToggleActive");
-            
-            // Optional: var sSelectedValue = oClickedItem.getText(); to trigger data reloads
         }
-    });
-});
+
+
+
+/* Card Container */
+.customKpiCard {
+    background-color: #ffffff;
+    border: 1px solid #d9d9d9;
+    border-radius: 4px;
+    padding: 16px;
+    width: 280px; /* Forces all 12 cards to be the exact same width */
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+/* Typography */
+.kpiCardTitle { color: #333333; font-size: 1rem !important; font-weight: bold !important; }
+.primaryKpiValue { color: #333333; font-size: 1.5rem; font-weight: bold; }
+.kpiSubLabel { color: #888888; font-size: 0.75rem; }
+.secondaryKpiValue { color: #333333; font-size: 0.85rem; font-weight: bold; }
+
+/* Font Weights */
+.primaryKpiPercent, .secondaryKpiPercent { font-weight: normal; }
+
+/* Colors (Passed from controller) */
+.negativePercentText { color: #d32030 !important; } /* Red */
+.positivePercentText { color: #2b7c2b !important; } /* Green */
+
+/* Tight rows at the bottom */
+.tightrow {
+    margin: 0 !important;
+    padding: 0 !important;
+    min-height: 22px !important;
+}
+.tightrow .kpiSubLabel, .tightrow .secondaryKpiValue, .tightrow .secondaryKpiPercent {
+    line-height: 1.2 !important; 
+}
