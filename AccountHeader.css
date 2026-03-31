@@ -154,3 +154,18 @@ fragments
 .tightrow .kpiSubLabel, .tightrow .secondaryKpiValue, .tightrow .secondaryKpiPercent {
     line-height: 1.2 !important; 
 }
+
+
+
+
+
+        <VBox id="mainCardsContainer" class="mainCardsContainer sapUiSmallMargin" 
+              visible="{= ${view>/selectedPage} === 'Group' &amp;&amp; ${view>/selectedSubPage} === 'Overview' }">
+            
+            <HBox id="topRow" class="topRow" items="{view>/kpiData}" wrap="Wrap">
+                <items>
+                    <core:Fragment fragmentName="project1.view.KpiCard" type="XML" />
+                </items>
+            </HBox>
+            
+        </VBox>
