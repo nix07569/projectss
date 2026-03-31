@@ -1,266 +1,270 @@
 <mvc:View
-    controllerName="project1.controller.View1"
+    controllerName="your.namespace.controller.Main"
     xmlns:mvc="sap.ui.core.mvc"
-    xmlns:core="sap.ui.core"
     xmlns="sap.m"
-    xmlns:f="sap.f"
-    xmlns:w="sap.ui.integration.widgets"
+    xmlns:core="sap.ui.core"
     displayBlock="true">
-
-    <f:DynamicPage id="page" headerExpanded="true" fitContent="true">
-        
-        <f:title>
-            <f:DynamicPageTitle id="dynamicPageTitle">
+    
+    <Page showHeader="false" class="sapUiContentPadding">
+        <content>
+            <HBox width="100%" justifyContent="SpaceBetween" alignItems="End" class="topNavContainer">
                 
-                <f:heading>
-                    <VBox id="headerLayoutWrapper">
-                        <HBox id="logoRow" alignItems="Center" class="sapUiSmallMarginBottom">
-                            <Button id="btnMenu" icon="sap-icon://menu2" type="Transparent" class="sapUiTinyMarginRight" />
-                            <Image id="imgLogo" src="./images/finsight_logo.png" height="35px" fallbackIcon="sap-icon://building" />
-                        </HBox>
-
-                        <HBox id="titleRow" alignItems="Center">
-                            <core:Icon id="iconFilter" src="sap-icon://filter" size="1.8rem" color="#0064d9" class="sapUiSmallMarginRight" />
-                            <Title id="mainHeadingTitle" text="{pageState>/selectedOrg} | Financials {pageState>/selectedView}" level="H2" />
-                        </HBox>
-                    </VBox>
-                </f:heading>
-                
-                <f:actions>
-                    <SegmentedButton id="orgToggle" selectedKey="{pageState>/selectedOrg}" selectionChange=".onToggleChange">
-                        <items>
-                            <SegmentedButtonItem id="btnGroup" key="Group" text="Group" />
-                            <SegmentedButtonItem id="btnCIB" key="CIB" text="CIB" />
-                            <SegmentedButtonItem id="btnWRB" key="WRB" text="WRB" />
-                        </items>
-                    </SegmentedButton>
-
-                    <SegmentedButton id="viewToggle" selectedKey="{pageState>/selectedView}" selectionChange=".onToggleChange">
-                        <items>
-                            <SegmentedButtonItem id="btnOverview" key="Overview" text="Overview" />
-                            <SegmentedButtonItem id="btnTrends" key="Trends" text="Trends" />
-                        </items>
-                    </SegmentedButton>
-
-                    <SegmentedButton id="scaleToggle" selectedKey="{pageState>/selectedScale}" selectionChange=".onToggleChange">
-                        <items>
-                            <SegmentedButtonItem id="btnScaleM" key="m" text="$m" />
-                            <SegmentedButtonItem id="btnScaleBn" key="bn" text="$bn" />
-                        </items>
-                    </SegmentedButton>
-                </f:actions>
-
-            </f:DynamicPageTitle>
-        </f:title>
-
-        <f:content>
-            <VBox id="mainContentWrapper" width="100%">
-                
-                <f:GridContainer 
-                    id="overviewContainer" 
-                    visible="{= ${pageState>/selectedView} === 'Overview' }"
-                    snapToRow="true">
+                <VBox class="leftNavSection">
                     
-                    <f:layout>
-                        <f:GridContainerSettings id="defaultGridSettings" rowSize="5rem" columnSize="16%" gap="1rem" />
-                    </f:layout>
+                    <HBox alignItems="End" class="logoRow sapUiSmallMarginBottom">
+                        <Button icon="sap-icon://menu2" type="Transparent" class="customMenuBtn sapUiTinyMarginEnd" />
+                        <VBox justifyContent="End">
+                            <Text text="Aspire" class="brandSubtitle" />
+                            <HBox alignItems="End">
+                                <Text text="Fin" class="brandLogoBlue" />
+                                <Text text="Sight." class="brandLogoGreen" />
+                                <Text text="Performance" class="brandLogoBlue" />
+                            </HBox>
+                        </VBox>
+                    </HBox>
                     
-                    <f:items>
-                        <w:Card id="cardIncome" class="flatTransparentCard" manifest="../cards/income/manifest.json" parameters="{ 'org': '{pageState>/selectedOrg}' }">
-                            <w:layoutData><f:GridContainerItemLayoutData id="lytIncome" columns="1" rows="3" /></w:layoutData>
-                        </w:Card>
-                        <w:Card id="cardNii" class="flatTransparentCard" manifest="../cards/nii/manifest.json" parameters="{ 'org': '{pageState>/selectedOrg}' }">
-                            <w:layoutData><f:GridContainerItemLayoutData id="lytNii" columns="1" rows="3" /></w:layoutData>
-                        </w:Card>
-                        <w:Card id="cardCosts" class="flatTransparentCard" manifest="../cards/costs/manifest.json" parameters="{ 'org': '{pageState>/selectedOrg}' }">
-                            <w:layoutData><f:GridContainerItemLayoutData id="lytCosts" columns="1" rows="3" /></w:layoutData>
-                        </w:Card>
-                        <w:Card id="cardImpairments" class="flatTransparentCard" manifest="../cards/impairments/manifest.json" parameters="{ 'org': '{pageState>/selectedOrg}' }">
-                            <w:layoutData><f:GridContainerItemLayoutData id="lytImpairments" columns="1" rows="3" /></w:layoutData>
-                        </w:Card>
-                        <w:Card id="cardProfit" class="flatTransparentCard" manifest="../cards/profit/manifest.json" parameters="{ 'org': '{pageState>/selectedOrg}' }">
-                            <w:layoutData><f:GridContainerItemLayoutData id="lytProfit" columns="1" rows="3" /></w:layoutData>
-                        </w:Card>
-                        <w:Card id="cardRote" class="flatTransparentCard" manifest="../cards/rote/manifest.json" parameters="{ 'org': '{pageState>/selectedOrg}' }">
-                            <w:layoutData><f:GridContainerItemLayoutData id="lytRote" columns="1" rows="3" /></w:layoutData>
-                        </w:Card>
-
-                        <w:Card id="cardJaws" class="flatTransparentCard" manifest="../cards/jaws/manifest.json" parameters="{ 'org': '{pageState>/selectedOrg}' }">
-                            <w:layoutData><f:GridContainerItemLayoutData id="lytJaws" columns="1" rows="3" /></w:layoutData>
-                        </w:Card>
-                        <w:Card id="cardCir" class="flatTransparentCard" manifest="../cards/cir/manifest.json" parameters="{ 'org': '{pageState>/selectedOrg}' }">
-                            <w:layoutData><f:GridContainerItemLayoutData id="lytCir" columns="1" rows="3" /></w:layoutData>
-                        </w:Card>
-                        <w:Card id="cardHeadcount" class="flatTransparentCard" manifest="../cards/headcount/manifest.json" parameters="{ 'org': '{pageState>/selectedOrg}' }">
-                            <w:layoutData><f:GridContainerItemLayoutData id="lytHeadcount" columns="1" rows="3" /></w:layoutData>
-                        </w:Card>
-                        <w:Card id="cardFundedAssets" class="flatTransparentCard" manifest="../cards/fundedAssets/manifest.json" parameters="{ 'org': '{pageState>/selectedOrg}' }">
-                            <w:layoutData><f:GridContainerItemLayoutData id="lytFundedAssets" columns="1" rows="3" /></w:layoutData>
-                        </w:Card>
-                        <w:Card id="cardRwa" class="flatTransparentCard" manifest="../cards/rwa/manifest.json" parameters="{ 'org': '{pageState>/selectedOrg}' }">
-                            <w:layoutData><f:GridContainerItemLayoutData id="lytRwa" columns="1" rows="3" /></w:layoutData>
-                        </w:Card>
-                        <w:Card id="cardRwaSecondary" class="flatTransparentCard" manifest="../cards/rwasecondary/manifest.json" parameters="{ 'org': '{pageState>/selectedOrg}' }">
-                            <w:layoutData><f:GridContainerItemLayoutData id="lytRwaSecondary" columns="1" rows="3" /></w:layoutData>
-                        </w:Card>
-                    </f:items>
-                </f:GridContainer>
-
-                <VBox id="trendsContainer" visible="{= ${pageState>/selectedView} === 'Trends' }" alignItems="Center" justifyContent="Center" height="400px">
-                    <IllustratedMessage id="illusTrends" illustrationType="sapIllus-EmptyList" title="Trends Data" description="Trends reference will be added later." />
+                    <HBox alignItems="Center" class="titleRow">
+                        <Button icon="sap-icon://filter" type="Transparent" class="customFilterBtn sapUiTinyMarginEnd" />
+                        <HBox alignItems="Center">
+                            <Text text="{view>/selectedPage}" class="titleLight" />
+                            <Text text="|" class="titleSeparator sapUiTinyMarginBeginEnd" />
+                            <Text text="{view>/dynamicSubHeading}" class="titleBold" />
+                        </HBox>
+                    </HBox>
                 </VBox>
 
-            </VBox>
-        </f:content>
-    </f:DynamicPage>
+                <HBox alignItems="Start" class="rightNavSection">
+                    
+                    <VBox alignItems="Center" justifyContent="Center" 
+                          class="{= ${view>/selectedPage} === 'Group' ? 'navColumn activeTabBackground sapUiTinyMarginEnd' : 'navColumn sapUiTinyMarginEnd' }">
+                        <Link text="Group" press=".onPageSelect" 
+                              class="{= ${view>/selectedPage} === 'Group' ? 'navLink activePrimaryLink' : 'navLink primaryLink' }" />
+                    </VBox>
+
+                    <VBox alignItems="Center" 
+                          class="{= ${view>/selectedPage} === 'CIB' ? 'navColumn activeTabBackground sapUiTinyMarginEnd' : 'navColumn sapUiTinyMarginEnd' }">
+                        <Link text="CIB" press=".onPageSelect" 
+                              class="{= ${view>/selectedPage} === 'CIB' ? 'navLink activePrimaryLink sapUiTinyMarginBottom' : 'navLink primaryLink sapUiTinyMarginBottom' }" />
+                        <Link text="Overview" press=".onSubPageSelect" 
+                              class="{= ${view>/selectedSubPage} === 'Overview' ? 'navLink activeSubLink sapUiTinyMarginBottom' : 'navLink secondaryLink sapUiTinyMarginBottom' }" />
+                        
+                        <SegmentedButton id="scaleToggle" selectedKey="{view>/selectedScale}" selectionChange=".onStateChange" class="customToggle">
+                            <items>
+                                <SegmentedButtonItem text="$m" key="m" />
+                                <SegmentedButtonItem text="$bn" key="bn" />
+                            </items>
+                        </SegmentedButton>
+                    </VBox>
+
+                    <VBox alignItems="Center" 
+                          class="{= ${view>/selectedPage} === 'WRB' ? 'navColumn activeTabBackground' : 'navColumn' }">
+                        <Link text="WRB" press=".onPageSelect" 
+                              class="{= ${view>/selectedPage} === 'WRB' ? 'navLink activePrimaryLink sapUiTinyMarginBottom' : 'navLink primaryLink sapUiTinyMarginBottom' }" />
+                        <Link text="Trends" press=".onSubPageSelect" 
+                              class="{= ${view>/selectedSubPage} === 'Trends' ? 'navLink activeSubLink sapUiTinyMarginBottom' : 'navLink secondaryLink sapUiTinyMarginBottom' }" />
+                        
+                        <SegmentedButton id="fxToggle" selectedKey="{view>/selectedFx}" selectionChange=".onStateChange" class="customToggle">
+                            <items>
+                                <SegmentedButtonItem text="RFX" key="RFX" />
+                                <SegmentedButtonItem text="CFX" key="CFX" />
+                            </items>
+                        </SegmentedButton>
+                    </VBox>
+                    
+                </HBox>
+            </HBox>
+        </content>
+    </Page>
 </mvc:View>
 
 
-controller
+/* --- Container & Layout --- */
+.topNavContainer {
+    padding: 1rem;
+    border-bottom: 1px solid #e5e5e5;
+    background-color: #f7f9fa; 
+}
+
+.navColumn {
+    padding: 0.5rem 1rem;
+    min-width: 80px;
+    border-radius: 4px;
+    transition: background-color 0.2s ease;
+}
+
+.activeTabBackground {
+    background-color: #e2e6e9; /* Light grey for the selected column */
+}
+
+/* --- Left Section Branding & Typography --- */
+.brandSubtitle {
+    color: #0066cc;
+    font-size: 0.75rem;
+    line-height: 1;
+    margin-bottom: -2px;
+    font-weight: 600;
+}
+
+.brandLogoBlue {
+    color: #0066cc;
+    font-size: 1.25rem;
+    font-weight: bold;
+    letter-spacing: -0.5px;
+}
+
+.brandLogoGreen {
+    color: #7bc043; 
+    font-size: 1.25rem;
+    font-weight: bold;
+    letter-spacing: -0.5px;
+}
+
+.customMenuBtn .sapMBtnIcon,
+.customFilterBtn .sapMBtnIcon {
+    color: #0066cc !important;
+    font-size: 1.5rem;
+}
+
+.titleLight {
+    color: #666666;
+    font-size: 1.75rem;
+    font-weight: 300;
+}
+
+.titleSeparator {
+    color: #cccccc;
+    font-size: 1.75rem;
+    font-weight: 300;
+}
+
+.titleBold {
+    color: #333333;
+    font-size: 1.75rem;
+    font-weight: 700;
+}
+
+/* --- Right Section Typography & Links --- */
+.navLink {
+    text-decoration: none !important;
+    font-family: Arial, Helvetica, sans-serif;
+    cursor: pointer;
+}
+
+.navLink:hover {
+    text-decoration: underline !important;
+}
+
+.primaryLink {
+    color: #4a90e2 !important; /* Softer blue for inactive */
+    font-size: 1rem;
+    font-weight: 400;
+}
+
+.activePrimaryLink {
+    color: #1866c1 !important; /* Darker blue for active */
+    font-size: 1rem;
+    font-weight: 500;
+}
+
+.secondaryLink {
+    color: #4a90e2 !important;
+    font-size: 0.875rem;
+}
+
+.activeSubLink {
+    color: #1866c1 !important;
+    font-size: 0.875rem;
+    font-weight: bold;
+}
+
+/* --- Segmented Button (Toggle) Overrides --- */
+.customToggle {
+    border-radius: 2px !important;
+    overflow: hidden;
+    height: 26px; 
+}
+
+.customToggle .sapMSegBBtn {
+    border-radius: 0 !important;
+    border: 1px solid #b3b3b3;
+    background-color: #f7f9fa; 
+    color: #333333;
+    text-shadow: none;
+    padding: 0 0.5rem;
+    font-size: 0.75rem;
+    min-width: 3.5rem;
+}
+
+.customToggle .sapMSegBBtn.sapMSegBBtnSel {
+    background-color: #1866c1 !important;
+    border-color: #1866c1 !important;
+    color: #ffffff !important;
+}
+
+.customToggle .sapMSegBBtnFocusable:focus {
+    outline: none !important;
+}
+
 
 sap.ui.define([
     "sap/ui/core/mvc/Controller",
-    "sap/ui/model/json/JSONModel",
-    "sap/m/MessageToast"
-], function (Controller, JSONModel, MessageToast) {
+    "sap/ui/model/json/JSONModel"
+], function (Controller, JSONModel) {
     "use strict";
 
-    return Controller.extend("project1.controller.View1", {
+    return Controller.extend("your.namespace.controller.Main", {
         onInit: function () {
+            // Define the initial state of the application
             var oStateData = {
-                selectedOrg: "CIB",
-                selectedView: "Overview",
-                selectedScale: "m"
+                selectedPage: "CIB",        
+                selectedSubPage: "Overview", 
+                selectedScale: "m",
+                selectedFx: "RFX",
+                dynamicSubHeading: "" 
             };
-
-            var oStateModel = new JSONModel(oStateData);
-            this.getView().setModel(oStateModel, "pageState");
+            
+            var oViewModel = new JSONModel(oStateData);
+            this.getView().setModel(oViewModel, "view");
+            
+            // Generate the initial header text
+            this._updateHeader();
         },
 
-        onToggleChange: function(oEvent) {
-            var oModel = this.getView().getModel("pageState");
-            var sOrg = oModel.getProperty("/selectedOrg");
-            var sView = oModel.getProperty("/selectedView");
+        // Triggered when clicking "Group", "CIB", or "WRB"
+        onPageSelect: function (oEvent) {
+            var sSelectedPage = oEvent.getSource().getText();
+            this.getView().getModel("view").setProperty("/selectedPage", sSelectedPage);
+            this._updateHeader();
+        },
+
+        // Triggered when clicking "Overview" or "Trends"
+        onSubPageSelect: function (oEvent) {
+            var sSelectedSubPage = oEvent.getSource().getText();
+            this.getView().getModel("view").setProperty("/selectedSubPage", sSelectedSubPage);
+            this._updateHeader();
+        },
+
+        // Triggered when clicking the Segmented Buttons ($m/$bn or RFX/CFX)
+        onStateChange: function (oEvent) {
+            // Note: Two-way binding handles the selectedKey update in the model automatically
+            this._updateHeader();
+        },
+
+        // Recalculates the right side of the main heading based on current selections
+        _updateHeader: function () {
+            var oViewModel = this.getView().getModel("view");
             
-            // Provides brief feedback; Cards update automatically via binding
-            MessageToast.show("Switched to " + sOrg + " | " + sView);
+            var sSubPage = oViewModel.getProperty("/selectedSubPage");
+            var sScale = oViewModel.getProperty("/selectedScale"); 
+            var sFx = oViewModel.getProperty("/selectedFx");       
+            
+            // Format: "Financials Overview ($m | RFX)" or "Trends ($bn | CFX)"
+            // You can adjust the exact wording here if needed
+            var sSubHeadingText = sSubPage === "Overview" ? "Financials Overview" : "Financials Trends";
+            var sNewSubHeading = sSubHeadingText + " ($" + sScale + " | " + sFx + ")";
+            
+            oViewModel.setProperty("/dynamicSubHeading", sNewSubHeading);
         }
     });
 });
 
-
-manifest
-
-{
-  "sap.app": {
-    "id": "my.app.cards.kpiCard",
-    "type": "card"
-  },
-  "sap.card": {
-    "type": "List",
-    "configuration": {
-      "parameters": {
-        "org": {"value": "CIB"}
-      }
-    },
-    "data": {
-      "request": {
-        "url": "./mockData.json"
-      },
-      "path": "/{{parameters.org}}"
-    },
-    "header": {
-      "type": "Numeric",
-      "title": "{title}",
-      "mainIndicator": {
-        "number": "{mainValue}",
-        "unit": "{mainTrend}",
-        "state": "{trendColor}"
-      },
-      "details": "{mainSubtitle}"
-    },
-    "content": {
-      "data": {
-        "path": "/{{parameters.org}}/listData"
-      },
-      "item": {
-        "columns": [
-          {
-            "value": "{label}"
-          },
-          {
-            "value": "{value}",
-            "hAlign": "End"
-          }
-        ]
-      }
-    }
-  }
-}
-
-
-
-mock datat
-
-
-      {
-  "Group": {
-    "title": "Income",
-    "mainValue": "28.50",
-    "mainTrend": "(14.20%)",
-    "trendColor": "Success",
-    "mainSubtitle": "YTD Actuals (YoY %)",
-    "listData": [
-      { "label": "Vs Budget", "value": "4.20" },
-      { "label": "PQTD Actuals (YoY %)", "value": "8.15 (12.4%)" },
-      { "label": "PY Outlook (YoY %)", "value": "29.10 (8%)" }
-    ]
-  },
-  "CIB": {
-    "title": "Income",
-    "mainValue": "9.01",
-    "mainTrend": "(11.46%)",
-    "trendColor": "Success",
-    "mainSubtitle": "YTD Actuals (YoY %)",
-    "listData": [
-      { "label": "Vs Budget", "value": "1.85" },
-      { "label": "PQTD Actuals (YoY %)", "value": "3.47 (17.92%)" },
-      { "label": "FY Outlook (YoY %)", "value": "12.19 ( )" }
-    ]
-  },
-  "WRB": {
-    "title": "Income",
-    "mainValue": "14.22",
-    "mainTrend": "(-2.10%)",
-    "trendColor": "Error",
-    "mainSubtitle": "YTD Actuals (YoY %)",
-    "listData": [
-      { "label": "Vs Budget", "value": "-0.50" },
-      { "label": "PQTD Actuals (YoY %)", "value": "4.12 (-1.2%)" },
-      { "label": "PY Outlook (YoY %)", "value": "15.00 (2%)" }
-    ]
-  }
-}
-
-
-       css
-    /* Make Integration Cards completely flat and transparent */
-.flatTransparentCard,
-.flatTransparentCard .sapFCard {
-    background: transparent !important;
-    background-color: transparent !important;
-    box-shadow: none !important;
-    border: none !important;
-}
-
-/* Remove the default padding to tighten up the floating text */
-.flatTransparentCard .sapFCardHeader {
-    padding-left: 0 !important;
-    padding-right: 0 !important;
-    padding-top: 0.5rem !important;
-}
-
-.flatTransparentCard .sapFCardContent {
-    padding-left: 0 !important;
-    padding-right: 0 !important;
-}
