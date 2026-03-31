@@ -1,21 +1,96 @@
-INSERT INTO "T1GDTL_PHY"."MY_SAMPLE_MODULESUMMARY" 
-("MODULE", "APPROVED", "PENDING", "UPLOADED", "PERCENTAGE", "USAGEMONTH", "USAGEQUARTER", "USAGEYEAR")
-VALUES 
-('ESG', 25, 5, 1, 33.85, 17, 31, 31),
-('FINCOST', 2, 2, 0, 6.45, 0, 0, 0),
-('ICON', 6, 0, 0, 8.63, 2, 0, 0),
-('NFRP', 22, 2, 0, 42.66, 23, 24, 24),
-('TREASURY', 5, 0, 1, 8.41, 0, 6, 6);
+<VBox class="customKpiCard sapUiSmallMargin">
+    
+    <Title text="Impairments" class="kpiCardTitle sapUiMediumMarginBottom" />
+
+    <VBox class="sapUiMediumMarginBottom">
+        <HBox alignItems="Baseline" class="sapUiTinyMarginBottom">
+            <Text text="-0.01" class="primaryKpiValue sapUiTinyMarginEnd" />
+            <Text text="(166.16%)" class="negativePercentText primaryKpiPercent" />
+        </HBox>
+        <Text text="YTD Actuals (YoY %)" class="kpiSubLabel" />
+    </VBox>
+
+    <VBox width="100%">
+        <HBox justifyContent="SpaceBetween" class="sapUiTinyMarginBottom">
+            <Text text="Vs. Budget" class="kpiSubLabel" />
+            <Text text="0.27" class="secondaryKpiValue" />
+        </HBox>
+        
+        <HBox justifyContent="SpaceBetween" class="sapUiTinyMarginBottom">
+            <Text text="CY PQ Actuals (YoY %)" class="kpiSubLabel" />
+            <HBox alignItems="Baseline">
+                <Text text="-0.04" class="secondaryKpiValue sapUiTinyMarginEnd" />
+                <Text text="(138.54%)" class="negativePercentText secondaryKpiPercent" />
+            </HBox>
+        </HBox>
+        
+        <HBox justifyContent="SpaceBetween">
+            <Text text="FY Outlook (YoY %)" class="kpiSubLabel" />
+            <HBox alignItems="Baseline">
+                <Text text="0.28" class="secondaryKpiValue sapUiTinyMarginEnd" />
+                <Text text="(11,409.84%)" class="negativePercentText secondaryKpiPercent" />
+            </HBox>
+        </HBox>
+    </VBox>
+    
+</VBox>
+
+/* Card Container */
+.customKpiCard {
+    background-color: #ffffff;
+    border: 1px solid #e5e5e5;
+    border-radius: 6px;
+    padding: 1.5rem;
+    width: 320px; /* Adjust width based on your grid/layout needs */
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05); /* Optional subtle shadow */
+}
+
+/* Header Title */
+.kpiCardTitle {
+    color: #333333;
+    font-size: 1rem !important;
+    font-weight: 700 !important;
+}
+
+/* Primary KPI Values */
+.primaryKpiValue {
+    color: #333333;
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+.primaryKpiPercent {
+    font-size: 1rem;
+    font-weight: 400;
+}
+
+/* Secondary/Footer KPI Values */
+.secondaryKpiValue {
+    color: #333333;
+    font-size: 0.75rem;
+    font-weight: 700;
+}
+
+.secondaryKpiPercent {
+    font-size: 0.75rem;
+    font-weight: 400;
+}
+
+/* Shared Utility Classes */
+.kpiSubLabel {
+    color: #888888; /* Light gray text from the screenshot */
+    font-size: 0.75rem;
+    font-weight: 400;
+}
+
+.negativePercentText {
+    color: #d32030; /* Fiori standard negative semantic color (red) */
+}
+
+/* If you have positive values in other cards, you can use this */
+.positivePercentText {
+    color: #2b7c2b; /* Fiori standard positive semantic color (green) */
+}
 
 
-CREATE VIEW "T1GDTL_PHY"."PROJECTS_MODULESUMMARY" AS 
-SELECT 
-    "MODULE" AS "Module",
-    "APPROVED" AS "approved",
-    "PENDING" AS "pending",
-    "UPLOADED" AS "uploaded",
-    "PERCENTAGE" AS "percentage",
-    "USAGEMONTH" AS "usageMonth",
-    "USAGEQUARTER" AS "usageQuarter",
-    "USAGEYEAR" AS "usageYear"
-FROM "T1GDTL_PHY"."MY_SAMPLE_MODULESUMMARY";
+
