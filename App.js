@@ -1,3 +1,29 @@
+{
+    "title": "Funded Assets",
+    "primaryValue": "-0.01",
+    "primaryPercent": "166.16%",
+    "isNegative": true,
+    "subLabel": "YTD Actuals (YoY %)",
+
+    "row1Label": "Vs. Budget",
+    "row1Value": "0.27",
+
+    "row2Label": "CY PQ Actuals (YoY %)",
+    "row2Value": "-0.04",
+    "row2Percent": "138.54%",
+    "row2IsNegative": true,
+
+    "row3Label": "FY Outlook (YoY %)",
+    "row3Value": "0.28",
+    "row3Percent": "49.84%",
+    "row3IsNegative": false
+}
+
+
+
+
+
+
 sap.ui.define([
     "sap/ui/core/mvc/Controller",
     "sap/ui/model/json/JSONModel",
