@@ -219,26 +219,100 @@ chxchh
 jshshhsjsjwkwk
 
 
+/* --- Card Container --- */
+.customKpiCard {
+    background-color: #ffffff;
+    border: 1px solid #e5e5e5;
+    border-radius: 0.25rem;
+    padding: 1rem;
+    box-shadow: 0 1px 2px 0 rgba(0,0,0,0.05);
+    min-width: 250px;
+}
+
+/* --- Title --- */
+.kpiCardTitle {
+    font-size: 1rem !important;
+    font-weight: bold !important;
+    color: #333333 !important;
+    margin-bottom: 1rem !important;
+}
+
+/* --- Primary KPI Section (Top) --- */
+.primaryKpiValue {
+    font-size: 1rem !important;
+    font-weight: bold !important;
+    color: #333333 !important;
+}
+
+.primaryKpiPercent {
+    font-size: 1rem !important;
+    font-weight: bold !important;
+}
+
+/* --- Sub Labels (Grey text like "YTD Actuals") --- */
+.kpiSubLabel {
+    font-size: 0.75rem !important;
+    color: #666666 !important;
+    margin-top: 0.25rem !important;
+}
+
+/* --- Secondary KPI Section (Bottom rows) --- */
+.impairmentsBottom {
+    margin-top: 1rem;
+    border-top: 1px solid #f2f2f2; /* Optional: adds a subtle line above the bottom section */
+    padding-top: 0.5rem;
+}
+
+.tightrow {
+    margin-top: 0.25rem;
+}
+
+.secondaryKpiValue {
+    font-size: 0.75rem !important;
+    color: #333333 !important;
+}
+
+.secondaryKpiPercent {
+    font-size: 0.75rem !important;
+}
+
+/* --- Dynamic Colors --- */
+.sapThemeNegativeText {
+    color: var(--sapThemeNegativeText, #bb0000) !important;
+}
+
+.sapThemePositiveText {
+    color: var(--sapThemePositiveText, #2b7d2b) !important;
+}
+
+/* --- Fix Icon Alignment --- */
+.customKpiCard .sapUiIcon {
+    vertical-align: baseline !important;
+    margin: 0 1px !important; /* Keeps the arrow tight against the text */
+}
+
+
 <core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core">
     <VBox class="customKpiCard">
         
         <Title text="{card>/title}" class="kpiCardTitle"/>
         
         <VBox>
-            <HBox class="cardValue">
+            <HBox class="cardValue" alignItems="Baseline">
                 
                 <Text text="{card>/primaryValue}" class="primaryKpiValue" />
                 
                 <HBox alignItems="Baseline" class="sapUiTinyMarginBegin">
-                    <Text text="(" class="{= ${card>/isNegative} === true ? 'sapThemeNegativeText' : 'sapThemePositiveText' } primaryKpiPercent" />
+                    <Text text="(" class="{= ${card>/isNegative} === true ? 'sapThemeNegativeText primaryKpiPercent' : 'sapThemePositiveText primaryKpiPercent' }" />
                     
                     <core:Icon 
                         src="{= ${card>/isNegative} === true ? 'sap-icon://arrow-bottom' : 'sap-icon://arrow-top' }"
+                        size="1rem"
                         class="{= ${card>/isNegative} === true ? 'sapThemeNegativeText' : 'sapThemePositiveText' }" />
                     
                     <Text 
-                        text=" {card>/primaryPercent})" 
-                        class="{= ${card>/isNegative} === true ? 'sapThemeNegativeText' : 'sapThemePositiveText' } primaryKpiPercent" />
+                        text="{card>/primaryPercent})" 
+                        class="{= ${card>/isNegative} === true ? 'sapThemeNegativeText primaryKpiPercent' : 'sapThemePositiveText primaryKpiPercent' }" />
                 </HBox>
             </HBox>
             
@@ -259,14 +333,16 @@ jshshhsjsjwkwk
                     <Text text="{card>/row2Value}" class="secondaryKpiValue sapUiTinyMarginEnd" />
                     
                     <HBox alignItems="Baseline">
-                        <Text text="(" class="{= ${card>/row2IsNegative} === true ? 'sapThemeNegativeText' : 'sapThemePositiveText' } secondaryKpiPercent" />
+                        <Text text="(" class="{= ${card>/row2IsNegative} === true ? 'sapThemeNegativeText secondaryKpiPercent' : 'sapThemePositiveText secondaryKpiPercent' }" />
+                        
                         <core:Icon 
                             src="{= ${card>/row2IsNegative} === true ? 'sap-icon://arrow-bottom' : 'sap-icon://arrow-top' }"
+                            size="0.75rem"
                             class="{= ${card>/row2IsNegative} === true ? 'sapThemeNegativeText' : 'sapThemePositiveText' }" />
                         
                         <Text 
-                            text=" {card>/row2Percent})" 
-                            class="{= ${card>/row2IsNegative} === true ? 'sapThemeNegativeText' : 'sapThemePositiveText' } secondaryKpiPercent" />
+                            text="{card>/row2Percent})" 
+                            class="{= ${card>/row2IsNegative} === true ? 'sapThemeNegativeText secondaryKpiPercent' : 'sapThemePositiveText secondaryKpiPercent' }" />
                     </HBox>
                 </HBox>
             </HBox>
@@ -278,14 +354,16 @@ jshshhsjsjwkwk
                     <Text text="{card>/row3Value}" class="secondaryKpiValue sapUiTinyMarginEnd" />
                     
                     <HBox alignItems="Baseline">
-                        <Text text="(" class="{= ${card>/row3IsNegative} === true ? 'sapThemeNegativeText' : 'sapThemePositiveText' } secondaryKpiPercent" />
+                        <Text text="(" class="{= ${card>/row3IsNegative} === true ? 'sapThemeNegativeText secondaryKpiPercent' : 'sapThemePositiveText secondaryKpiPercent' }" />
+                        
                         <core:Icon 
                             src="{= ${card>/row3IsNegative} === true ? 'sap-icon://arrow-bottom' : 'sap-icon://arrow-top' }"
+                            size="0.75rem"
                             class="{= ${card>/row3IsNegative} === true ? 'sapThemeNegativeText' : 'sapThemePositiveText' }" />
                         
                         <Text 
-                            text=" {card>/row3Percent})" 
-                            class="{= ${card>/row3IsNegative} === true ? 'sapThemeNegativeText' : 'sapThemePositiveText' } secondaryKpiPercent" />
+                            text="{card>/row3Percent})" 
+                            class="{= ${card>/row3IsNegative} === true ? 'sapThemeNegativeText secondaryKpiPercent' : 'sapThemePositiveText secondaryKpiPercent' }" />
                     </HBox>
                 </HBox>
             </HBox>
@@ -293,4 +371,5 @@ jshshhsjsjwkwk
         </VBox>
     </VBox>
 </core:FragmentDefinition>
+
 
