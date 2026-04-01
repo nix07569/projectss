@@ -185,3 +185,86 @@ chxchh
         </VBox>
     </VBox>
 </core:FragmentDefinition>
+
+
+
+
+
+jshshhsjsjwkwk
+
+
+<core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core">
+    <VBox class="customKpiCard">
+        
+        <Title text="{card>/title}" class="kpiCardTitle"/>
+        
+        <VBox>
+            <HBox class="cardValue">
+                
+                <Text text="{card>/primaryValue}" class="primaryKpiValue" />
+                
+                <HBox alignItems="Baseline" class="sapUiTinyMarginBegin">
+                    <Text text="(" class="{= ${card>/isNegative} === true ? 'sapThemeNegativeText' : 'sapThemePositiveText' } primaryKpiPercent" />
+                    
+                    <core:Icon 
+                        src="{= ${card>/isNegative} === true ? 'sap-icon://arrow-bottom' : 'sap-icon://arrow-top' }"
+                        class="{= ${card>/isNegative} === true ? 'sapThemeNegativeText' : 'sapThemePositiveText' }" />
+                    
+                    <Text 
+                        text=" {card>/primaryPercent})" 
+                        class="{= ${card>/isNegative} === true ? 'sapThemeNegativeText' : 'sapThemePositiveText' } primaryKpiPercent" />
+                </HBox>
+            </HBox>
+            
+            <Text text="{card>/subLabel}" class="kpiSubLabel" />
+        </VBox>
+
+        <VBox class="impairmentsBottom" width="100%">
+            
+            <HBox justifyContent="SpaceBetween" visible="{= ${card>/row1Label} !== undefined }">
+                <Text text="{card>/row1Label}" class="kpiSubLabel" />
+                <Text text="{card>/row1Value}" class="secondaryKpiValue" />
+            </HBox>
+            
+            <HBox justifyContent="SpaceBetween" class="tightrow" visible="{= ${card>/row2Label} !== undefined }">
+                <Text text="{card>/row2Label}" class="kpiSubLabel" />
+                
+                <HBox alignItems="Baseline">
+                    <Text text="{card>/row2Value}" class="secondaryKpiValue sapUiTinyMarginEnd" />
+                    
+                    <HBox alignItems="Baseline">
+                        <Text text="(" class="{= ${card>/row2IsNegative} === true ? 'sapThemeNegativeText' : 'sapThemePositiveText' } secondaryKpiPercent" />
+                        <core:Icon 
+                            src="{= ${card>/row2IsNegative} === true ? 'sap-icon://arrow-bottom' : 'sap-icon://arrow-top' }"
+                            class="{= ${card>/row2IsNegative} === true ? 'sapThemeNegativeText' : 'sapThemePositiveText' }" />
+                        
+                        <Text 
+                            text=" {card>/row2Percent})" 
+                            class="{= ${card>/row2IsNegative} === true ? 'sapThemeNegativeText' : 'sapThemePositiveText' } secondaryKpiPercent" />
+                    </HBox>
+                </HBox>
+            </HBox>
+
+            <HBox justifyContent="SpaceBetween" class="tightrow" visible="{= ${card>/row3Label} !== undefined }">
+                <Text text="{card>/row3Label}" class="kpiSubLabel" />
+                
+                <HBox alignItems="Baseline">
+                    <Text text="{card>/row3Value}" class="secondaryKpiValue sapUiTinyMarginEnd" />
+                    
+                    <HBox alignItems="Baseline">
+                        <Text text="(" class="{= ${card>/row3IsNegative} === true ? 'sapThemeNegativeText' : 'sapThemePositiveText' } secondaryKpiPercent" />
+                        <core:Icon 
+                            src="{= ${card>/row3IsNegative} === true ? 'sap-icon://arrow-bottom' : 'sap-icon://arrow-top' }"
+                            class="{= ${card>/row3IsNegative} === true ? 'sapThemeNegativeText' : 'sapThemePositiveText' }" />
+                        
+                        <Text 
+                            text=" {card>/row3Percent})" 
+                            class="{= ${card>/row3IsNegative} === true ? 'sapThemeNegativeText' : 'sapThemePositiveText' } secondaryKpiPercent" />
+                    </HBox>
+                </HBox>
+            </HBox>
+
+        </VBox>
+    </VBox>
+</core:FragmentDefinition>
+
