@@ -1,171 +1,119 @@
-fragments
+<mvc:View
+    controllerName="my.app.controller.Main"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:f="sap.f"
+    xmlns:layout="sap.ui.layout">
 
-<core:FragmentDefinition 
-    xmlns="sap.m" 
-    xmlns:core="sap.ui.core">
-    
-    <VBox class="customKpiCard sapUiSmallMarginEnd sapUiSmallMarginBottom">
-        
-        <Title text="{view>title}" class="kpiCardTitle sapUiSmallMarginBottom" />
+    <f:DynamicPage id="financialsPage">
+        <f:title>
+            <f:DynamicPageTitle>
+                <f:heading>
+                    <Title text="Group | Financials Overview" />
+                </f:heading>
+            </f:DynamicPageTitle>
+        </f:title>
 
-        <VBox class="cardInfo sapUiSmallMarginBottom">
-            <HBox class="cardValue" justifyContent="SpaceBetween" alignItems="Baseline">
-                <Text text="{view>mainValue}" class="primaryKpiValue sapUiTinyMarginEnd" />
-                <Text text="{view>mainPercent}" class="{view>mainClass} primaryKpiPercent" />
-            </HBox>
-            <Text text="{view>mainLabel}" class="kpiSubLabel" />
-        </VBox>
+        <f:header>
+            <f:DynamicPageHeader>
+                <layout:VerticalLayout width="100%">
+                    <IconTabBar id="idMainNavigation" select=".onMainNavChange" selectedKey="GROUP" class="sapUiNoContentPadding">
+                        <items>
+                            <IconTabFilter text="Group" key="GROUP" />
+                            <IconTabFilter text="CIB" key="CIB" />
+                            <IconTabFilter text="WRB" key="WRB" />
+                        </items>
+                    </IconTabBar>
 
-        <VBox class="impairmentsBottom" width="100%">
-            <HBox justifyContent="SpaceBetween" class="tightrow" visible="{= !!${view>row1Key} }">
-                <Text text="{view>row1Key}" class="kpiSubLabel" />
-                <Text text="{view>row1Value}" class="secondaryKpiValue" />
-            </HBox>
-            
-            <HBox justifyContent="SpaceBetween" class="tightrow" visible="{= !!${view>row2Key} }">
-                <Text text="{view>row2Key}" class="kpiSubLabel" />
-                <HBox alignItems="Baseline">
-                    <Text text="{view>row2Value}" class="secondaryKpiValue sapUiTinyMarginEnd" />
-                    <Text text="{view>row2Percent}" class="{view>row2Class} secondaryKpiPercent" />
-                </HBox>
-            </HBox>
-            
-            <HBox justifyContent="SpaceBetween" class="tightrow" visible="{= !!${view>row3Key} }">
-                <Text text="{view>row3Key}" class="kpiSubLabel" />
-                <HBox alignItems="Baseline">
-                    <Text text="{view>row3Value}" class="secondaryKpiValue sapUiTinyMarginEnd" />
-                    <Text text="{view>row3Percent}" class="{view>row3Class} secondaryKpiPercent" />
-                </HBox>
-            </HBox>
-        </VBox>
-        
-    </VBox>
-</core:FragmentDefinition>
+                    <Toolbar style="Clear">
+                        <SegmentedButton id="idSubNav" selectedKey="OVERVIEW" selectionChange=".onSubNavChange">
+                            <items>
+                                <SegmentedButtonItem text="Overview" key="OVERVIEW" />
+                                <SegmentedButtonItem text="Trends" key="TRENDS" />
+                            </items>
+                        </SegmentedButton>
+
+                        <ToolbarSpacer />
+
+                        <SegmentedButton id="idCurrencyToggle" selectedKey="M" selectionChange=".onDataToggle">
+                            <items>
+                                <SegmentedButtonItem text="$m" key="M" />
+                                <SegmentedButtonItem text="$bn" key="BN" />
+                            </items>
+                        </SegmentedButton>
+
+                        <SegmentedButton id="idFXToggle" selectedKey="RFX" selectionChange=".onDataToggle">
+                            <items>
+                                <SegmentedButtonItem text="RFX" key="RFX" />
+                                <SegmentedButtonItem text="CFX" key="CFX" />
+                            </items>
+                        </SegmentedButton>
+                    </Toolbar>
+                </layout:VerticalLayout>
+            </f:DynamicPageHeader>
+        </f:header>
+
+        <f:content>
+            <VBox id="pageBody" class="sapUiMediumMargin">
+                <Text text="Body content for: " />
+                <Title id="idStatusText" text="Group > Overview ($m, RFX)" />
+            </VBox>
+        </f:content>
+
+    </f:DynamicPage>
+</mvc:View>
 
 
+sap.ui.define([
+    "sap/ui/core/mvc/Controller",
+    "sap/ui/model/json/JSONModel"
+], function (Controller, JSONModel) {
+    "use strict";
 
-
+    return Controller.extend("my.app.controller.Main", {
         onInit: function () {
-            var oStateData = {
-                selectedPage: "Group",       
-                selectedSubPage: "Overview", 
-                
-                // Array of 12 Cards
-                kpiData: [
-                    {
-                        title: "Impairments",
-                        mainValue: "-0.01",
-                        mainPercent: "(166.16%)",
-                        mainClass: "negativePercentText", // Turns it Red
-                        mainLabel: "YTD Actuals (YoY %)",
-                        
-                        row1Key: "Vs. Budget",
-                        row1Value: "0.27",
-                        
-                        row2Key: "CY PQ Actuals (YoY %)",
-                        row2Value: "-0.04",
-                        row2Percent: "(138.54%)",
-                        row2Class: "negativePercentText",
-                        
-                        row3Key: "FY Outlook (YoY %)",
-                        row3Value: "0.28",
-                        row3Percent: "(11,409.84%)",
-                        row3Class: "positivePercentText" // Turns it Green
-                    },
-                    {
-                        title: "Underlying Profit",
-                        mainValue: "4.60",
-                        mainPercent: "(12.5%)",
-                        mainClass: "positivePercentText", 
-                        mainLabel: "YTD Actuals (YoY %)",
-                        
-                        row1Key: "Vs. Budget",
-                        row1Value: "0.50",
-                        
-                        row2Key: "CY PQ Actuals (YoY %)",
-                        row2Value: "1.20",
-                        row2Percent: "(5.1%)",
-                        row2Class: "positivePercentText",
-                        
-                        row3Key: "FY Outlook (YoY %)",
-                        row3Value: "5.10",
-                        row3Percent: "(10.0%)",
-                        row3Class: "positivePercentText"
-                    },
-                    {
-                        title: "Operating Expenses",
-                        mainValue: "1.20",
-                        mainPercent: "(2.1%)",
-                        mainClass: "negativePercentText", 
-                        mainLabel: "YTD Actuals (YoY %)",
-                        
-                        row1Key: "Vs. Budget",
-                        row1Value: "-0.15",
-                        
-                        row2Key: "CY PQ Actuals (YoY %)",
-                        row2Value: "0.80",
-                        row2Percent: "(1.5%)",
-                        row2Class: "negativePercentText",
-                        
-                        row3Key: "FY Outlook (YoY %)",
-                        row3Value: "1.50",
-                        row3Percent: "(3.2%)",
-                        row3Class: "negativePercentText"
-                    }
-                    // ... Add 9 more card objects here!
-                ]
-            };
+            // Set up a local model to track the state of the dashboard
+            var oStateModel = new JSONModel({
+                mainNav: "GROUP",
+                subNav: "OVERVIEW",
+                currency: "M",
+                fxType: "RFX"
+            });
+            this.getView().setModel(oStateModel, "state");
+        },
+
+        onMainNavChange: function (oEvent) {
+            var sKey = oEvent.getParameter("key");
+            this._updateUIState("mainNav", sKey);
+        },
+
+        onSubNavChange: function (oEvent) {
+            var sKey = oEvent.getParameter("key");
+            this._updateUIState("subNav", sKey);
+        },
+
+        onDataToggle: function () {
+            // Get keys from the segmented buttons
+            var sCurr = this.byId("idCurrencyToggle").getSelectedKey();
+            var sFX = this.byId("idFXToggle").getSelectedKey();
             
-            var oViewModel = new sap.ui.model.json.JSONModel(oStateData);
-            this.getView().setModel(oViewModel, "view");
+            this._updateUIState("currency", sCurr);
+            this._updateUIState("fxType", sFX);
+        },
+
+        _updateUIState: function (sProperty, sValue) {
+            var oModel = this.getView().getModel("state");
+            oModel.setProperty("/" + sProperty, sValue);
+
+            // Update placeholder text to show it's working
+            var sStatus = oModel.getProperty("/mainNav") + " > " + 
+                          oModel.getProperty("/subNav") + " ($" + 
+                          oModel.getProperty("/currency").toLowerCase() + ", " + 
+                          oModel.getProperty("/fxType") + ")";
+            
+            this.byId("idStatusText").setText(sStatus);
+            
+            // Logic to re-fetch data based on new parameters would go here
         }
-
-
-
-/* Card Container */
-.customKpiCard {
-    background-color: #ffffff;
-    border: 1px solid #d9d9d9;
-    border-radius: 4px;
-    padding: 16px;
-    width: 280px; /* Forces all 12 cards to be the exact same width */
-    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-}
-
-/* Typography */
-.kpiCardTitle { color: #333333; font-size: 1rem !important; font-weight: bold !important; }
-.primaryKpiValue { color: #333333; font-size: 1.5rem; font-weight: bold; }
-.kpiSubLabel { color: #888888; font-size: 0.75rem; }
-.secondaryKpiValue { color: #333333; font-size: 0.85rem; font-weight: bold; }
-
-/* Font Weights */
-.primaryKpiPercent, .secondaryKpiPercent { font-weight: normal; }
-
-/* Colors (Passed from controller) */
-.negativePercentText { color: #d32030 !important; } /* Red */
-.positivePercentText { color: #2b7c2b !important; } /* Green */
-
-/* Tight rows at the bottom */
-.tightrow {
-    margin: 0 !important;
-    padding: 0 !important;
-    min-height: 22px !important;
-}
-.tightrow .kpiSubLabel, .tightrow .secondaryKpiValue, .tightrow .secondaryKpiPercent {
-    line-height: 1.2 !important; 
-}
-
-
-
-
-
-        <VBox id="mainCardsContainer" class="mainCardsContainer sapUiSmallMargin" 
-              visible="{= ${view>/selectedPage} === 'Group' &amp;&amp; ${view>/selectedSubPage} === 'Overview' }">
-            
-            <HBox id="topRow" class="topRow" items="{view>/kpiData}" wrap="Wrap">
-                <items>
-                    <core:Fragment fragmentName="project1.view.KpiCard" type="XML" />
-                </items>
-            </HBox>
-            
-        </VBox>
+    });
+});
