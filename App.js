@@ -119,3 +119,69 @@ sap.ui.define([
         </VBox>
     </VBox>
 </core:FragmentDefinition>
+
+
+
+
+chxchh
+
+<core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core">
+    <VBox class="customKpiCard sapUiSmallMargin">
+        
+        <Title text="{card>/title}" class="kpiCardTitle"/>
+        
+        <VBox>
+            <HBox class="cardValue" alignItems="Center">
+                <Text text="{card>/primaryValue}" class="primaryKpiValue sapUiTinyMarginEnd" />
+                
+                <core:Icon 
+                    src="{= ${card>/isNegative} === true ? 'sap-icon://down' : 'sap-icon://up' }"
+                    class="{= ${card>/isNegative} === true ? 'negativePercentText' : 'positivePercentText' } sapUiTinyMarginEnd" />
+                
+                <Text 
+                    text="{card>/primaryPercent}" 
+                    class="{= ${card>/isNegative} === true ? 'negativePercentText' : 'positivePercentText' } primaryKpiPercent" />
+            </HBox>
+            <Text text="{card>/subLabel}" class="kpiSubLabel" />
+        </VBox>
+
+        <VBox class="impairmentsBottom" width="100%">
+            
+            <HBox justifyContent="SpaceBetween" class="tightrow">
+                <Text text="Vs. Budget" class="kpiSubLabel" />
+                <Text text="{card>/budgetVal}" class="secondaryKpiValue" />
+            </HBox>
+            
+            <HBox justifyContent="SpaceBetween" class="tightrow">
+                <Text text="CY PQ Actuals (YoY %)" class="kpiSubLabel" />
+                <HBox alignItems="Center">
+                    <Text text="{card>/cyPqValue}" class="secondaryKpiValue sapUiTinyMarginEnd" />
+                    
+                    <core:Icon 
+                        src="{= ${card>/cyPqIsNegative} === true ? 'sap-icon://down' : 'sap-icon://up' }"
+                        class="{= ${card>/cyPqIsNegative} === true ? 'negativePercentText' : 'positivePercentText' } sapUiTinyMarginEnd" />
+                    
+                    <Text 
+                        text="{card>/cyPqPercent}" 
+                        class="{= ${card>/cyPqIsNegative} === true ? 'negativePercentText' : 'positivePercentText' } secondaryKpiPercent" />
+                </HBox>
+            </HBox>
+
+            <HBox justifyContent="SpaceBetween" class="tightrow">
+                <Text text="FY Outlook (YoY %)" class="kpiSubLabel" />
+                <HBox alignItems="Center">
+                    <Text text="{card>/fyOutlookValue}" class="secondaryKpiValue sapUiTinyMarginEnd" />
+                    
+                    <core:Icon 
+                        src="{= ${card>/fyOutlookIsNegative} === true ? 'sap-icon://down' : 'sap-icon://up' }"
+                        class="{= ${card>/fyOutlookIsNegative} === true ? 'negativePercentText' : 'positivePercentText' } sapUiTinyMarginEnd" />
+                    
+                    <Text 
+                        text="{card>/fyOutlookPercent}" 
+                        class="{= ${card>/fyOutlookIsNegative} === true ? 'negativePercentText' : 'positivePercentText' } secondaryKpiPercent" />
+                </HBox>
+            </HBox>
+
+        </VBox>
+    </VBox>
+</core:FragmentDefinition>
