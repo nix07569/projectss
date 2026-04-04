@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mvc:View
+  controllerName="finsight.controller.App"
+  xmlns:mvc="sap.ui.core.mvc"
+  xmlns="sap.m"
+  xmlns:f="sap.f"
+  xmlns:core="sap.ui.core"
+  xmlns:layout="sap.ui.layout"
+  displayBlock="true">
+
+  <Shell>
+    <App id="mainApp">
+      <pages>
+
+        <!-- ═══════════════════════════════════════════════════════
+             MAIN PAGE
+        ════════════════════════════════════════════════════════ -->
+        <Page id="mainPage" showHeader="false" backgroundDesign="Solid">
+
+          <!-- ── Custom Header mimicking SAP Analytics Cloud / FinSight bar ── -->
+          <customHeader>
+            <Bar id="mainBar" design="Header" class="finsightTopBar">
+
+              <!-- LEFT: Logo + Breadcrumb title -->
+              <contentLeft>
+                <HBox alignItems="Center" class="finsightLogoArea">
+
+                  <!-- Hamburger menu icon -->
+                  <Button
+                    icon="sap-icon://menu2"
+                    type="Transparent"
+                    class="finsightMenuBtn"
+                    press=".onMenuPress" />
+
+                  <!-- Logo block -->
+                  <VBox class="finsightLogoBlock" justifyContent="Center">
+                    <Label text="Aspire" class="finsightAspireLabel" />
+                    <HBox alignItems="Center">
+                      <Text text="Fin" class="finsightLogoFin" />
+                      <Text text="Sight" class="finsightLogoSight" />
+                      <Text text=".Performance" class="finsightLogoPerf" />
+                    </HBox>
+                  </VBox>
+
+                </HBox>
+              </contentLeft>
+
+              <!-- MIDDLE: Dynamic page title -->
+              <contentMiddle>
+                <!-- Empty – title shown in page content header -->
+              </contentMiddle>
+
+              <!-- RIGHT: empty for now -->
+              <contentRight>
+                <Button icon="sap-icon://action-settings" type="Transparent" />
+                <Button icon="sap-icon://person-placeholder" type="Transparent" />
+              </contentRight>
+
+            </Bar>
+          </customHeader>
+
+          <!-- ── Page Content ── -->
+          <content>
+            <VBox class="finsightPageRoot">
+
+              <!-- SUB-TOOLBAR: Filter icon + Dynamic H1 Title -->
+              <HBox alignItems="Center" class="finsightTitleBar">
+                <core:Icon src="sap-icon://filter" class="finsightFilterIcon" />
+                <Title
+                  id="pageTitle"
+                  text="{state>/headerTitle}"
+                  level="H1"
+                  class="finsightPageTitle" />
+              </HBox>
+
+              <!-- NAVIGATION PANEL: top-right segment + view tabs + toggles -->
+              <HBox justifyContent="End" alignItems="Start" class="finsightNavPanel">
+                <VBox alignItems="End" class="finsightNavControls">
+
+                  <!-- ROW 1: Segment buttons (Group | CIB | WRB) -->
+                  <HBox class="finsightSegmentRow">
+                    <Button id="btnGroup" text="Group" press=".onSegmentPress" customData:key="Group"
+                      class="finsightSegBtn" />
+                    <Button id="btnCIB"   text="CIB"   press=".onSegmentPress" customData:key="CIB"
+                      class="finsightSegBtn" />
+                    <Button id="btnWRB"   text="WRB"   press=".onSegmentPress" customData:key="WRB"
+                      class="finsightSegBtn" />
+                  </HBox>
+
+                  <!-- ROW 2: View tabs (Overview | Trends) -->
+                  <HBox class="finsightViewRow">
+                    <Button id="btnOverview" text="Overview" press=".onViewPress" customData:key="Overview"
+                      class="finsightViewBtn" />
+                    <Button id="btnTrends"   text="Trends"   press=".onViewPress" customData:key="Trends"
+                      class="finsightViewBtn" />
+                  </HBox>
+
+                  <!-- ROW 3: Reporting Period + Toggles -->
+                  <HBox alignItems="Center" class="finsightTogglesRow">
+                    <Label text="Reporting Period :" class="finsightRPLabel" />
+                    <Text text="{mockData>/reportingPeriod}" class="finsightRPValue" />
+
+                    <!-- Unit toggle: $m / $bn -->
+                    <SegmentedButton
+                      id="unitToggle"
+                      selectionChange=".onUnitToggle"
+                      class="finsightSegToggle finsightUnitToggle">
+                      <items>
+                        <SegmentedButtonItem id="unitM"  text="$m"  key="m" />
+                        <SegmentedButtonItem id="unitBN" text="$bn" key="bn" />
+                      </items>
+                    </SegmentedButton>
+
+                    <!-- FX toggle: RFX / CFX -->
+                    <SegmentedButton
+                      id="fxToggle"
+                      selectionChange=".onFXToggle"
+                      class="finsightSegToggle finsightFXToggle">
+                      <items>
+                        <SegmentedButtonItem id="fxRFX" text="RFX" key="RFX" />
+                        <SegmentedButtonItem id="fxCFX" text="CFX" key="CFX" />
+                      </items>
+                    </SegmentedButton>
+
+                  </HBox>
+                </VBox>
+              </HBox>
+
+              <!-- RESET LINK -->
+              <HBox class="finsightResetRow">
+                <Link text="Reset" press=".onReset" class="finsightResetLink" />
+              </HBox>
+
+              <!-- SEPARATOR -->
+              <core:HTML content="&lt;hr class='finsightDivider'/&gt;" />
+
+              <!-- CONTENT AREA: card fragment injected here -->
+              <VBox id="cardContainer" class="finsightCardContainer" />
+
+            </VBox>
+          </content>
+
+        </Page>
+      </pages>
+    </App>
+  </Shell>
+
+</mvc:View>

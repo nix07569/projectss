@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Fragment: TrendsCards.fragment.xml
+  Purpose : Renders trend chart cards for Trends pages (Group / CIB / WRB).
+  Binding : Bound to the "cards" array of the active segment/Trends view from mockData.
+  Usage   : Fragment.load({ name: "finsight.fragment.TrendsCards", controller: oController })
+              .then(function(oFrag){ oContainer.addItem(oFrag); });
+-->
+<core:FragmentDefinition
+  xmlns="sap.m"
+  xmlns:core="sap.ui.core"
+  xmlns:layout="sap.ui.layout">
+
+  <layout:Grid
+    id="trendsGrid"
+    defaultSpan="XL6 L6 M12 S12"
+    hSpacing="1"
+    vSpacing="1"
+    class="finsightCardGrid">
+
+    <layout:content>
+
+      <!-- Trend Card Template (controller binds dynamically) -->
+      <Panel class="finsightTrendCard" backgroundDesign="Solid">
+        <content>
+          <VBox class="finsightTrendCardInner">
+
+            <!-- Title + YoY badge -->
+            <HBox justifyContent="SpaceBetween" alignItems="Center" class="finsightTrendHeader">
+              <Title text="{view>title}" level="H5" class="finsightCardTitle" />
+              <HBox alignItems="Center" class="finsightYoYBadge">
+                <core:Icon
+                  src="{= ${view>yoy} >= 0 ? 'sap-icon://trend-up' : 'sap-icon://trend-down' }"
+                  class="{= ${view>yoy} >= 0 ? 'finsightVarUp' : 'finsightVarDown' }" />
+                <Text
+                  text="{= Math.abs(${view>yoy}) + '% YoY' }"
+                  class="{= ${view>yoy} >= 0 ? 'finsightVarUpText' : 'finsightVarDownText' }" />
+              </HBox>
+            </HBox>
+
+            <!-- Trend chart area (SVG rendered by controller into core:HTML) -->
+            <core:HTML content="{view>trendChartHtml}" class="finsightTrendChartWrap" />
+
+            <!-- Month labels row -->
+            <HBox justifyContent="SpaceBetween" class="finsightTrendLabels">
+              <Label text="{view>label0}" class="finsightTrendLabel" />
+              <Label text="{view>label1}" class="finsightTrendLabel" />
+              <Label text="{view>label2}" class="finsightTrendLabel" />
+              <Label text="{view>label3}" class="finsightTrendLabel" />
+              <Label text="{view>label4}" class="finsightTrendLabel" />
+              <Label text="{view>label5}" class="finsightTrendLabel" />
+            </HBox>
+
+          </VBox>
+        </content>
+      </Panel>
+
+    </layout:content>
+  </layout:Grid>
+
+</core:FragmentDefinition>
