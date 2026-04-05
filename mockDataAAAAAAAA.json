@@ -1,0 +1,36 @@
+{
+  "reportingPeriod": "Mar, 2026",
+
+  "Group": {
+    "Overview": {
+      "title": "Group | Financials | Overview",
+      "cards": []
+    },
+    "Trends": {
+      "title": "Group | Financials | Trends",
+      "cards": []
+    }
+  },
+
+  "CIB": {
+    "Overview": {
+      "title": "CIB | Financials | Overview",
+      "cards": []
+    },
+    "Trends": {
+      "title": "CIB | Financials | Trends",
+      "cards": []
+    }
+  },
+
+  "WRB": {
+    "Overview": {
+      "title": "WRB | Financials | Overview",
+      "cards": []
+    },
+    "Trends": {
+      "title": "WRB | Financials | Trends",
+      "cards": []
+    }
+  }
+}

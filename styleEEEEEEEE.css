@@ -1,0 +1,229 @@
+/* ================================================================
+   FinSight Performance  —  style.css
+   Prefix : fs  (avoids collisions with SAP's sapM* classes)
+   No external fonts — SAP UI5 ships the '72' font automatically
+================================================================ */
+
+/* ── PAGE ROOT ── */
+.fsPageRoot {
+    background: #ffffff;
+    min-height: 100%;
+}
+
+/* ════════════════════════════════════════
+   TOP HEADER BAR
+════════════════════════════════════════ */
+.fsTopBar.sapMBar {
+    background: #ffffff !important;
+    border-bottom: 1px solid #e0e0e0 !important;
+    box-shadow: none !important;
+}
+
+.fsLogoBlock { padding-left: 8px; }
+
+.fsLogoAspire.sapMLabelBase {
+    font-size: 9px !important;
+    color: #74777a !important;
+    font-style: italic;
+    letter-spacing: 0.4px;
+    line-height: 1.1 !important;
+    display: block;
+}
+.fsLogoFin.sapMText {
+    font-size: 16px !important;
+    font-weight: 700 !important;
+    color: #1870C5 !important;
+    line-height: 1.25 !important;
+}
+.fsLogoSight.sapMText {
+    font-size: 16px !important;
+    font-weight: 700 !important;
+    color: #32363a !important;
+    line-height: 1.25 !important;
+}
+.fsLogoPerf.sapMText {
+    font-size: 16px !important;
+    font-weight: 400 !important;
+    color: #32363a !important;
+    line-height: 1.25 !important;
+}
+
+/* ════════════════════════════════════════
+   TITLE BAR  (filter icon + dynamic H1)
+════════════════════════════════════════ */
+.fsTitleBar {
+    padding: 16px 24px 4px 24px !important;
+    align-items: center;
+    gap: 10px;
+}
+.fsFilterIcon {
+    font-size: 20px !important;
+    color: #32363a !important;
+    margin-right: 8px;
+}
+.fsPageTitle.sapMTitle {
+    font-size: 24px !important;
+    font-weight: 700 !important;
+    color: #32363a !important;
+    line-height: 1.25 !important;
+}
+
+/* ════════════════════════════════════════
+   NAV PANEL
+════════════════════════════════════════ */
+.fsNavPanel  { padding: 0 24px; }
+.fsNavControls { align-items: flex-end !important; }
+
+/* ── Segment row (Group | CIB | WRB) ── */
+.fsSegRow {
+    border-bottom: 2px solid #e5e5e5;
+    gap: 0 !important;
+    align-items: flex-end;
+}
+.fsSegBtn.sapMBtn .sapMBtnInner {
+    background: transparent !important;
+    border: none !important;
+    border-bottom: 3px solid transparent !important;
+    border-radius: 0 !important;
+    padding: 6px 18px !important;
+    font-size: 14px !important;
+    font-weight: 400 !important;
+    color: #74777a !important;
+    margin-bottom: -2px;
+    transition: color 0.15s, border-color 0.15s;
+}
+.fsSegBtn.sapMBtn:hover .sapMBtnInner {
+    color: #32363a !important;
+    background: transparent !important;
+}
+/* Active — dark navy underline, matches reference */
+.fsSegBtnActive.sapMBtn .sapMBtnInner {
+    color: #1a3661 !important;
+    font-weight: 700 !important;
+    border-bottom: 3px solid #1a3661 !important;
+}
+
+/* ── View row (Overview | Trends) ── */
+.fsViewRow {
+    border-bottom: 2px solid #e5e5e5;
+    gap: 0 !important;
+    align-items: flex-end;
+    margin-top: 4px;
+}
+.fsViewBtn.sapMBtn .sapMBtnInner {
+    background: transparent !important;
+    border: none !important;
+    border-bottom: 3px solid transparent !important;
+    border-radius: 0 !important;
+    padding: 5px 14px !important;
+    font-size: 13px !important;
+    font-weight: 400 !important;
+    color: #74777a !important;
+    margin-bottom: -2px;
+    transition: color 0.15s, border-color 0.15s;
+}
+.fsViewBtn.sapMBtn:hover .sapMBtnInner {
+    color: #32363a !important;
+    background: transparent !important;
+}
+.fsViewBtnActive.sapMBtn .sapMBtnInner {
+    color: #1a3661 !important;
+    font-weight: 700 !important;
+    border-bottom: 3px solid #1a3661 !important;
+}
+
+/* ── Toggles row ($m/$bn  ·  RFX/CFX) ── */
+.fsTogglesRow {
+    gap: 10px !important;
+    margin-top: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+.fsRPLabel.sapMLabelBase {
+    font-size: 13px !important;
+    font-weight: 700 !important;
+    color: #32363a !important;
+}
+.fsRPValue.sapMText {
+    font-size: 13px !important;
+    color: #32363a !important;
+}
+
+.fsSegToggle.sapMSegB {
+    border: 1.5px solid #1870C5 !important;
+    border-radius: 4px !important;
+    overflow: hidden;
+    height: 28px !important;
+}
+.fsSegToggle .sapMSegBBtn {
+    background: #ffffff !important;
+    color: #1870C5 !important;
+    font-size: 12px !important;
+    font-weight: 600 !important;
+    padding: 0 13px !important;
+    height: 26px !important;
+    min-width: 42px !important;
+    border: none !important;
+    transition: background 0.12s, color 0.12s;
+}
+.fsSegToggle .sapMSegBBtn.sapMSegBBtnSel {
+    background: #1870C5 !important;
+    color: #ffffff !important;
+}
+.fsSegToggle .sapMSegBBtn:not(.sapMSegBBtnSel):hover {
+    background: #e8f3ff !important;
+}
+
+/* ════════════════════════════════════════
+   RESET LINK + DIVIDER
+════════════════════════════════════════ */
+.fsResetRow { padding: 8px 24px 2px 24px; }
+
+.fsResetLink.sapMLnk {
+    font-size: 13px !important;
+    color: #1870C5 !important;
+}
+
+.fsDivider {
+    border: none;
+    border-top: 1px solid #e5e5e5;
+    margin: 4px 24px 20px 24px;
+}
+
+/* ════════════════════════════════════════
+   CONTENT AREA  (blank placeholder)
+════════════════════════════════════════ */
+.fsContentArea {
+    padding: 0 24px 32px 24px;
+    min-height: 300px;
+}
+
+.fsBlankArea {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 280px;
+    gap: 12px;
+    border: 1px dashed #d9d9d9;
+    border-radius: 6px;
+    background: #fafafa;
+    margin-top: 8px;
+}
+
+.fsBlankIcon {
+    font-size: 48px !important;
+    color: #c8cacb !important;
+}
+
+.fsBlankTitle.sapMTitle {
+    font-size: 15px !important;
+    font-weight: 600 !important;
+    color: #74777a !important;
+    margin-top: 4px !important;
+}
+
+.fsBlankText.sapMText {
+    font-size: 13px !important;
+    color: #9a9a9a !important;
+}
