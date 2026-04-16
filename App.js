@@ -105,7 +105,8 @@ sap.ui.define([
         },
 
         oncustomToggleClick: function (oEvent) {
-            var sText  = oEvent.getSource().getText();
+            // Added .trim() to ensure hidden spaces in the UI button don't break the logic
+            var sText  = oEvent.getSource().getText().trim();
             var oModel = this.getOwnerComponent().getModel("store");
             
             if (sText === "$m" || sText === "$bn") {
@@ -193,22 +194,31 @@ sap.ui.define([
                                                     var oCardData = oParsed[sCurrencyKey] || {};
                                                     oCardData.widget = oParsed.widget;
 
-                                                    // ── NEW LOGIC: $m / $bn Unit Scaling ──
-                                                    if (oState.unit === "$bn") {
-                                                        // Explicitly target ONLY the main numbers, avoiding the YoY bracket values
+                                                    // ── CORRECTED LOGIC: Absolute to $m / $bn Unit Scaling ──
+                                                    var nDivisor = 1;
+                                                    var sCurrentUnit = oState.unit ? oState.unit.trim().toLowerCase() : "$m";
+                                                    
+                                                    // Determine the divisor based on the raw DB data
+                                                    if (sCurrentUnit === "$m" || sCurrentUnit === "m") {
+                                                        nDivisor = 1000000;       // Divide raw dollars by 1 Million
+                                                    } else if (sCurrentUnit === "$bn" || sCurrentUnit === "bn") {
+                                                        nDivisor = 1000000000;    // Divide raw dollars by 1 Billion
+                                                    }
+
+                                                    if (nDivisor !== 1) {
+                                                        // Explicitly target ONLY the main numbers, leaving the YoY bracket values untouched
                                                         var aScaleFields = ["ytdActuals", "vsBudget", "pqActuals", "fyOutlook"];
                                                         
                                                         aScaleFields.forEach(function (sField) {
                                                             if (oCardData[sField] !== undefined) {
                                                                 var nVal = parseFloat(oCardData[sField]);
                                                                 if (!isNaN(nVal)) {
-                                                                    // Divide by 1000 to convert millions to billions
-                                                                    oCardData[sField] = (nVal / 1000).toFixed(2);
+                                                                    oCardData[sField] = (nVal / nDivisor).toFixed(2);
                                                                 }
                                                             }
                                                         });
                                                     }
-                                                    // ── END NEW LOGIC ──
+                                                    // ── END LOGIC ──
 
                                                     var oCard = that._oKpiCardTemplate.clone();
                                                     var oCardModel = new sap.ui.model.json.JSONModel(oCardData);
