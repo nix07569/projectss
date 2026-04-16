@@ -1,375 +1,964 @@
-sap.ui.define([
-    "sap/ui/core/mvc/Controller",
-    "sap/ui/model/json/JSONModel",
-    "sap/ui/core/Fragment"
-], function (Controller, JSONModel, Fragment) {
-    "use strict";
+-- ============================================================
+--  INSERT ALL 12 WIDGETS INTO NEW TABLE
+--  Table: T1NFRP_NFRP_FINANCIALS_REPORTING_MASTER
+--
+--  Run in HANA Database Explorer.
+--  Execute each INSERT one at a time, or all together.
+--
+--  ID  WIDGET
+--  ─────────────────────────────────────
+--   1  Income
+--   2  Impairments
+--   3  Underlying Profit
+--   4  Funded Assets
+--   5  RoTE
+--   6  Costs
+--   7  NII
+--   8  First RWA
+--   9  JAWS
+--  10  CIR
+--  11  Controllable Headcount
+--  12  Second RWA
+-- ============================================================
 
-    return Controller.extend("project1.controller.View1", {
+-- ── 1. Income ────────────────────────────────────────────
 
-        onInit: function () {
-            var oRouter = this.getOwnerComponent().getRouter();
-            oRouter.getRoute("overview").attachPatternMatched(
-                this._onOverviewMatched, this
-            );
-        },
+INSERT INTO "T1NFRP_NFRP_FINANCIALS_REPORTING_MASTER"
+("ID", "WIDGET", "QUERY")
+VALUES (
+1,
+'Income',
+'SELECT
+  SUM(CASE WHEN alldata.DATA_TYPE = ''Actuals'' AND alldata.T_VERSION = ''YTD'' AND dateconfig.ADD16 = 0 AND alldata.M_ACCOUNT_0 = ''Income'' AND alldata.T_REPORTING = ''FPNA'' AND dateconfig.FILTER_DATE = ''CURRENT_MONTH'' AND dateconfig.FILTER_TYPE = ''PYR+CYR'' THEN alldata.RFX ELSE 0 END) AS YTD_ACTUALS_FPNA,
 
-        _onOverviewMatched: function () {
-            var oView = this.getView();
-            var oComponent = this.getOwnerComponent();
+  SUM(CASE WHEN alldata.DATA_TYPE = ''Actuals'' AND alldata.T_VERSION = ''YTD'' AND dateconfig.ADD16 = 0 AND alldata.M_ACCOUNT_0 = ''Income'' AND alldata.T_REPORTING = ''FPNA'' AND dateconfig.FILTER_DATE = ''CURRENT_MONTH'' AND dateconfig.FILTER_TYPE = ''PYR+CYR'' THEN alldata.RFX ELSE 0 END)
+  - SUM(CASE WHEN alldata.DATA_TYPE = ''Budget'' AND alldata.T_VERSION = ''YTD'' AND dateconfig.ADD16 = 0 AND alldata.M_ACCOUNT_0 = ''Income'' AND alldata.T_REPORTING = ''FPNA'' AND dateconfig.FILTER_DATE = ''CURRENT_MONTH'' AND dateconfig.FILTER_TYPE = ''PYR+CYR'' THEN alldata.RFX ELSE 0 END) AS VS_BUDGET_FPNA,
 
-            var oStoreModel = oComponent.getModel("store"); 
-            
-            if (!oStoreModel) {
-                oStoreModel = new JSONModel({
-                    state: {
-                        selectedTop: "Group",
-                        selectedSub: "Overview",
-                        unit: "$m",
-                        currency: "RFX"
-                    }
-                });
-                oComponent.setModel(oStoreModel, "store"); 
-                
-                this._refreshNavToggles();
-                this._updateGrid(); 
-            } else {
-                oStoreModel.setProperty("/state/selectedSub", "Overview");
-                this._refreshNavToggles();
-                this._updateGrid();
-            }
+  SUM(CASE WHEN alldata.DATA_TYPE = ''Actuals'' AND alldata.T_VERSION = ''QTD'' AND dateconfig.ADD17 = -1 AND alldata.M_ACCOUNT_0 = ''Income'' AND alldata.T_REPORTING = ''FPNA'' AND dateconfig.FILTER_DATE = ''CURRENT_MONTH'' AND dateconfig.FILTER_TYPE = ''PYR+CYR'' THEN alldata.RFX ELSE 0 END) AS PQTD_ACTUALS_FPNA,
 
-            var oChartModel = oView.getModel("chartStore");
-            if (!oChartModel) {
-                var sChartPath = sap.ui.require.toUrl("project1/model/data.json");
-                oChartModel = new JSONModel();
-                oChartModel.attachRequestCompleted(function () {
-                    this._chartData = oChartModel.getData().chartData;
-                    oView.setModel(oChartModel, "chartStore");
-                    setTimeout(function () {
-                        this._loadAndRenderECharts();
-                    }.bind(this), 150);
-                }.bind(this));
-                oChartModel.loadData(sChartPath);
-            } else {
-                this._chartData = oChartModel.getData().chartData;
-                setTimeout(function () {
-                    this._loadAndRenderECharts();
-                }.bind(this), 150);
-            }
-        },
+  SUM(CASE WHEN alldata.DATA_TYPE = ''Outlook_PM'' AND alldata.T_VERSION = ''YTD'' AND dateconfig.ADD19 = ''CY'' AND alldata.MONTH_ABR = ''FY'' AND alldata.M_ACCOUNT_0 = ''Income'' AND alldata.T_REPORTING = ''FPNA'' AND dateconfig.FILTER_DATE = ''CURRENT_MONTH'' AND dateconfig.FILTER_TYPE = ''PYR+CYR'' THEN alldata.RFX ELSE 0 END) AS FY_OUTLOOK_FPNA,
 
-        _refreshNavToggles: function () {
-            var oModel = this.getOwnerComponent().getModel("store");
-            if (!oModel) return;
+  SUM(CASE WHEN alldata.DATA_TYPE = ''Outlook_PM'' AND alldata.T_VERSION = ''YTD'' AND alldata.MONTH_ABR = ''FY'' AND alldata.M_ACCOUNT_0 = ''Income'' AND alldata.T_REPORTING = ''FPNA'' AND dateconfig.ADD19 = ''CY'' AND dateconfig.FILTER_DATE = ''CURRENT_MONTH'' AND dateconfig.FILTER_TYPE = ''PYR+CYR'' THEN alldata.RFX ELSE 0 END)
+  - SUM(CASE WHEN alldata.DATA_TYPE = ''Outlook_PM'' AND alldata.T_VERSION = ''YTD'' AND alldata.MONTH_ABR = ''FY'' AND alldata.M_ACCOUNT_0 = ''Income'' AND alldata.T_REPORTING = ''FPNA'' AND dateconfig.ADD19 = ''PY'' AND dateconfig.FILTER_DATE = ''CURRENT_MONTH'' AND dateconfig.FILTER_TYPE = ''PYR+CYR'' THEN alldata.RFX ELSE 0 END) AS VARIANCE_PYFY_OUTLOOK_FPNA,
 
-            var sTop      = oModel.getProperty("/state/selectedTop");
-            var sSub      = oModel.getProperty("/state/selectedSub");
-            var sUnit     = oModel.getProperty("/state/unit");
-            var sCurrency = oModel.getProperty("/state/currency");
+  SUM(CASE WHEN alldata.DATA_TYPE = ''Actuals'' AND alldata.M_ACCOUNT_0 = ''Income'' AND dateconfig.ADD17 = -1 AND alldata.T_VERSION = ''QTD'' AND alldata.T_REPORTING = ''FPNA'' AND dateconfig.FILTER_DATE = ''CURRENT_MONTH'' AND dateconfig.FILTER_TYPE = ''PYR+CYR'' THEN alldata.RFX ELSE 0 END)
+  - SUM(CASE WHEN alldata.DATA_TYPE = ''Actuals'' AND alldata.M_ACCOUNT_0 = ''Income'' AND dateconfig.ADD17 = -5 AND alldata.T_VERSION = ''MTD'' AND alldata.T_REPORTING = ''FPNA'' AND dateconfig.FILTER_DATE = ''CURRENT_MONTH'' AND dateconfig.FILTER_TYPE = ''PYR+CYR'' THEN alldata.RFX ELSE 0 END) AS PYPQTD_ACTUALS_FPNA,
 
-            this._setToggleActive("groupToggle",    sTop === "Group");
-            this._setToggleActive("CIBtoggle",      sTop === "CIB");
-            this._setToggleActive("WRBtoggle",      sTop === "WRB");
-            this._setToggleActive("overviewToggle", sSub === "Overview");
-            this._setToggleActive("trendsToggle",   sSub === "Trends");
-            this._setToggleActive("btnM",           sUnit === "$m");
-            this._setToggleActive("btnBn",          sUnit === "$bn");
-            this._setToggleActive("btnRFX",         sCurrency === "RFX");
-            this._setToggleActive("btnCFX",         sCurrency === "CFX");
-        },
+  SUM(CASE WHEN alldata.DATA_TYPE = ''Actuals'' AND alldata.M_ACCOUNT_0 = ''Income'' AND dateconfig.ADD16 = 0 AND alldata.T_VERSION = ''YTD'' AND alldata.T_REPORTING = ''FPNA'' AND dateconfig.FILTER_DATE = ''CURRENT_MONTH'' AND dateconfig.FILTER_TYPE = ''PYR+CYR'' THEN alldata.RFX ELSE 0 END)
+  - SUM(CASE WHEN alldata.DATA_TYPE = ''Actuals'' AND alldata.M_ACCOUNT_0 = ''Income'' AND dateconfig.ADD6 = ''PY_YTD'' AND alldata.T_VERSION = ''MTD'' AND alldata.T_REPORTING = ''FPNA'' AND dateconfig.FILTER_DATE = ''CURRENT_MONTH'' AND dateconfig.FILTER_TYPE = ''PYR+CYR'' THEN alldata.RFX ELSE 0 END) AS PY_YTD_ACTUALS_FPNA
 
-        _setToggleActive: function (sLocalId, bActive) {
-            var oControl = this.byId(sLocalId);
-            if (!oControl) return;
-            var oDom = oControl.getDomRef();
-            if (oDom) {
-                oDom.setAttribute("data-activeItem", bActive ? "true" : "false");
-            }
-        },
+FROM "T1NFRP_PHY"."CV_UP_NFRP_ALLDATA" alldata
+INNER JOIN "T1NFRP_PHY"."TBL_NFRP_DATE_CONFIG" dateconfig
+  ON alldata.E_PERIOD_DATE = dateconfig.E_PERIOD_DATE
+WHERE
+  (
+    (alldata.DATA_TYPE = ''Actuals'' AND alldata.T_VERSION = ''YTD'' AND dateconfig.ADD16 = 0 AND alldata.M_ACCOUNT_0 = ''Income'' AND alldata.T_REPORTING = ''FPNA'')
+    OR
+    (alldata.DATA_TYPE = ''Budget'' AND alldata.T_VERSION = ''YTD'' AND dateconfig.ADD16 = 0 AND alldata.M_ACCOUNT_0 = ''Income'' AND alldata.T_REPORTING = ''FPNA'')
+    OR
+    (alldata.T_VERSION = ''YTD'' AND dateconfig.ADD16 = 0 AND alldata.M_ACCOUNT_0 = ''Income'' AND alldata.T_REPORTING = ''FPNA'' AND (alldata.DATA_TYPE = ''Actuals'' OR alldata.DATA_TYPE = ''Budget''))
+    OR
+    (alldata.DATA_TYPE = ''Actuals'' AND alldata.T_VERSION = ''QTD'' AND dateconfig.ADD17 = -1 AND alldata.M_ACCOUNT_0 = ''Income'' AND alldata.T_REPORTING = ''FPNA'')
+    OR
+    (alldata.DATA_TYPE = ''Outlook_PM'' AND alldata.T_VERSION = ''YTD'' AND dateconfig.ADD19 = ''CY'' AND alldata.MONTH_ABR = ''FY'' AND alldata.M_ACCOUNT_0 = ''Income'' AND alldata.T_REPORTING = ''FPNA'')
+    OR
+    (alldata.DATA_TYPE = ''Outlook_PM'' AND alldata.T_VERSION = ''YTD'' AND alldata.MONTH_ABR = ''FY'' AND alldata.M_ACCOUNT_0 = ''Income'' AND alldata.T_REPORTING = ''FPNA'' AND (dateconfig.ADD19 = ''CY'' OR dateconfig.ADD19 = ''PY''))
+    OR
+    (alldata.DATA_TYPE = ''Actuals'' AND alldata.M_ACCOUNT_0 = ''Income'' AND alldata.T_REPORTING = ''FPNA'' AND ((dateconfig.ADD17 = -1 AND alldata.T_VERSION = ''QTD'') OR (dateconfig.ADD17 = -5 AND alldata.T_VERSION = ''MTD'')))
+    OR
+    (alldata.DATA_TYPE = ''Actuals'' AND alldata.M_ACCOUNT_0 = ''Income'' AND alldata.T_REPORTING = ''FPNA'' AND ((dateconfig.ADD16 = 0 AND alldata.T_VERSION = ''YTD'') OR (dateconfig.ADD6 = ''PY_YTD'' AND alldata.T_VERSION = ''MTD'')))
+  )
+  AND dateconfig.FILTER_DATE = ''CURRENT_MONTH''
+  AND dateconfig.FILTER_TYPE = ''PYR+CYR'''
+);
 
-        onPageSelect: function (oEvent) {
-            var sText  = oEvent.getSource().getText();
-            var oModel = this.getOwnerComponent().getModel("store");
-            oModel.setProperty("/state/selectedTop", sText);
-            this._refreshNavToggles();
-            this._updateGrid();
-        },
+-- ── 2. Impairments ───────────────────────────────────────
 
-        onSubPageSelect: function (oEvent) {
-            var sText  = oEvent.getSource().getText();
-            var oModel = this.getOwnerComponent().getModel("store");
-            oModel.setProperty("/state/selectedSub", sText);
-            this._refreshNavToggles();
-            this._updateGrid();
-        },
+INSERT INTO "T1NFRP_NFRP_FINANCIALS_REPORTING_MASTER"
+("ID", "WIDGET", "QUERY")
+VALUES (
+2,
+'Impairments',
+'WITH
+IMPAIRMENTS_CART AS (
+    SELECT
+        A.DATA_TYPE,
+        A.T_VERSION,
+        A.MONTH_ABR,
+        A.CFX,
+        A.RFX,
+        D.ADD16,
+        D.ADD17,
+        D.ADD18
+    FROM "T1NFRP_PHY"."CV_UP_NFRP_ALLDATA"          A
+    CROSS JOIN "T1NFRP_PHY"."TBL_NFRP_DATE_CONFIG"  D
+    WHERE A.M_ACCOUNT_0 = ''Impairments''
+    AND   A.T_REPORTING = ''CIB''
+    AND   D.FILTER_DATE = ''CURRENT_MONTH''
+    AND   D.FILTER_TYPE = ''PYR+CYR''
+),
 
-        oncustomToggleClick: function (oEvent) {
-            // Added .trim() to ensure hidden spaces in the UI button don't break the logic
-            var sText  = oEvent.getSource().getText().trim();
-            var oModel = this.getOwnerComponent().getModel("store");
-            
-            if (sText === "$m" || sText === "$bn") {
-                oModel.setProperty("/state/unit", sText);
-            } else if (sText === "RFX" || sText === "CFX") {
-                oModel.setProperty("/state/currency", sText);
-            }
-            this._refreshNavToggles();
-            this._updateGrid();
-        },
+IMPAIRMENTS_DATE AS (
+    SELECT
+        A.DATA_TYPE,
+        A.T_VERSION,
+        A.MONTH_ABR,
+        A.CFX,
+        A.RFX,
+        D.ADD6,
+        D.ADD16,
+        D.ADD18
+    FROM "T1NFRP_PHY"."CV_UP_NFRP_ALLDATA"         A
+    JOIN "T1NFRP_PHY"."TBL_NFRP_DATE_CONFIG"       D
+        ON A.E_PERIOD_DATE = D.E_PERIOD_DATE
+    WHERE A.M_ACCOUNT_0 = ''Impairments''
+    AND   A.T_REPORTING = ''CIB''
+    AND   D.FILTER_DATE = ''CURRENT_MONTH''
+    AND   D.FILTER_TYPE = ''PYR+CYR''
+),
 
-        onTrendsNavigate: function () {
-            var oModel = this.getOwnerComponent().getModel("store");
-            if (oModel) {
-                oModel.setProperty("/state/selectedSub", "Trends");
-                this._refreshNavToggles();
-            }
-            this.getOwnerComponent().getRouter().navTo("trends");
-        },
+YTD_ACTUALS AS (
+    SELECT
+        SUM(CFX) AS YTD_ACTUALS_CFX,
+        SUM(RFX) AS YTD_ACTUALS_RFX
+    FROM IMPAIRMENTS_CART
+    WHERE DATA_TYPE = ''Actuals''
+    AND   T_VERSION = ''YTD''
+    AND   ADD16     = 0
+),
 
-        _updateGrid: function () {
-            var oView      = this.getView();
-            var oModel     = this.getOwnerComponent().getModel("store");
-            if (!oModel) return;
+VS_BUDGET AS (
+    SELECT
+        SUM(CASE WHEN DATA_TYPE = ''Actuals'' THEN CFX ELSE 0 END) -
+        SUM(CASE WHEN DATA_TYPE = ''Budget''  THEN CFX ELSE 0 END) AS VS_BUDGET_CFX,
+        SUM(CASE WHEN DATA_TYPE = ''Actuals'' THEN RFX ELSE 0 END) -
+        SUM(CASE WHEN DATA_TYPE = ''Budget''  THEN RFX ELSE 0 END) AS VS_BUDGET_RFX
+    FROM IMPAIRMENTS_CART
+    WHERE DATA_TYPE IN (''Actuals'',''Budget'')
+    AND   T_VERSION  = ''YTD''
+    AND   ADD16      = 0
+),
 
-            var oState     = oModel.getProperty("/state");
-            var oContainer = this.byId("mainCardsContainer");
-            if (!oContainer) return;
+CY_PQ_ACTUALS AS (
+    SELECT
+        SUM(CFX) AS CY_PQ_ACTUALS_CFX,
+        SUM(RFX) AS CY_PQ_ACTUALS_RFX
+    FROM IMPAIRMENTS_CART
+    WHERE DATA_TYPE = ''Actuals''
+    AND   T_VERSION = ''QTD''
+    AND   ADD17     = -1
+),
 
-            oContainer.destroyItems();
-            this._fetchId = (this._fetchId || 0) + 1;
-            var iCurrentFetchId = this._fetchId;
+FY_OUTLOOK AS (
+    SELECT
+        SUM(CFX) AS FY_OUTLOOK_CFX,
+        SUM(RFX) AS FY_OUTLOOK_RFX
+    FROM IMPAIRMENTS_CART
+    WHERE DATA_TYPE = ''Outlook_PM''
+    AND   T_VERSION = ''YTD''
+    AND   ADD18     = 0
+    AND   ADD16     = 0
+),
 
-            var oPayload = {
-                topGroup: oState.selectedTop || "Group",
-                displayUnit: oState.unit || "$m",
-                currencyType: oState.currency || "RFX"
-            };
+PY_PQ_VARIANCE AS (
+    SELECT
+        SUM(CASE WHEN ADD17 = -1 THEN CFX ELSE 0 END) -
+        SUM(CASE WHEN ADD17 = -5 THEN CFX ELSE 0 END) AS PY_PQ_VARIANCE_CFX,
+        SUM(CASE WHEN ADD17 = -1 THEN RFX ELSE 0 END) -
+        SUM(CASE WHEN ADD17 = -5 THEN RFX ELSE 0 END) AS PY_PQ_VARIANCE_RFX
+    FROM IMPAIRMENTS_CART
+    WHERE DATA_TYPE = ''Actuals''
+    AND   T_VERSION = ''QTD''
+    AND   ADD17     IN (-1, -5)
+),
 
-            var that = this;
-            var sCurrencyKey = oState.currency ? oState.currency.toLowerCase() : "rfx";
+YTD_ACTUAL_PY AS (
+    SELECT
+        SUM(CASE WHEN DATA_TYPE = ''Actuals'' AND T_VERSION = ''YTD'' AND ADD16 = 0        THEN CFX ELSE 0 END) -
+        SUM(CASE WHEN DATA_TYPE = ''Actuals'' AND T_VERSION = ''MTD'' AND ADD6  = ''PY_YTD'' THEN CFX ELSE 0 END) AS YTD_ACTUAL_PY_CFX,
+        SUM(CASE WHEN DATA_TYPE = ''Actuals'' AND T_VERSION = ''YTD'' AND ADD16 = 0        THEN RFX ELSE 0 END) -
+        SUM(CASE WHEN DATA_TYPE = ''Actuals'' AND T_VERSION = ''MTD'' AND ADD6  = ''PY_YTD'' THEN RFX ELSE 0 END) AS YTD_ACTUAL_PY_RFX
+    FROM IMPAIRMENTS_DATE
+    WHERE DATA_TYPE = ''Actuals''
+),
 
-            var pLoadSkeleton = this._oSkeletonTemplate ? Promise.resolve() : sap.ui.core.Fragment.load({ name: "project1.view.fragments.SkeletonCard", controller: this }).then(function(f) { that._oSkeletonTemplate = f; });
-            var pLoadCard = this._oKpiCardTemplate ? Promise.resolve() : sap.ui.core.Fragment.load({ name: "project1.view.fragments.KpiCard", controller: this }).then(function(f) { that._oKpiCardTemplate = f; });
+FY_VS_YTD_ACTUAL_PY AS (
+    SELECT
+        SUM(CASE WHEN DATA_TYPE = ''Outlook_PM'' AND T_VERSION = ''YTD'' AND ADD18 = 0 AND ADD16 = 0 THEN CFX ELSE 0 END) -
+        SUM(CASE WHEN DATA_TYPE = ''Actuals''    AND T_VERSION = ''MTD'' AND ADD6 = ''PY_YTD''         THEN CFX ELSE 0 END) AS FY_VS_YTD_ACTUAL_PY_CFX,
+        SUM(CASE WHEN DATA_TYPE = ''Outlook_PM'' AND T_VERSION = ''YTD'' AND ADD18 = 0 AND ADD16 = 0 THEN RFX ELSE 0 END) -
+        SUM(CASE WHEN DATA_TYPE = ''Actuals''    AND T_VERSION = ''MTD'' AND ADD6 = ''PY_YTD''         THEN RFX ELSE 0 END) AS FY_VS_YTD_ACTUAL_PY_RFX
+    FROM IMPAIRMENTS_DATE
+    WHERE DATA_TYPE IN (''Outlook_PM'',''Actuals'')
+)
 
-            Promise.all([pLoadSkeleton, pLoadCard]).then(function() {
-                $.ajax({
-                    url: "/api/nrfp/getWidgetNames",
-                    method: "POST",
-                    contentType: "application/json",
-                    data: "{}",
-                    success: function (oResp) {
-                        if (that._fetchId !== iCurrentFetchId) return;
+SELECT
+    Y.YTD_ACTUALS_CFX,
+    Y.YTD_ACTUALS_RFX,
+    B.VS_BUDGET_CFX,
+    B.VS_BUDGET_RFX,
+    C.CY_PQ_ACTUALS_CFX,
+    C.CY_PQ_ACTUALS_RFX,
+    F.FY_OUTLOOK_CFX,
+    F.FY_OUTLOOK_RFX,
+    P.PY_PQ_VARIANCE_CFX,
+    P.PY_PQ_VARIANCE_RFX,
+    V.YTD_ACTUAL_PY_CFX,
+    V.YTD_ACTUAL_PY_RFX,
+    O.FY_VS_YTD_ACTUAL_PY_CFX,
+    O.FY_VS_YTD_ACTUAL_PY_RFX
+FROM            YTD_ACTUALS         Y
+CROSS JOIN      VS_BUDGET           B
+CROSS JOIN      CY_PQ_ACTUALS       C
+CROSS JOIN      FY_OUTLOOK          F
+CROSS JOIN      PY_PQ_VARIANCE      P
+CROSS JOIN      YTD_ACTUAL_PY       V
+CROSS JOIN      FY_VS_YTD_ACTUAL_PY O'
+);
 
-                        var aWidgets = oResp.value || oResp;
-                        
-                        var tDashboardStart = performance.now(); 
-                        var aPromises = []; 
+-- ── 3. Underlying Profit ─────────────────────────────────
 
-                        aWidgets.forEach(function (sWidgetName) {
-                            var oSkeleton = that._oSkeletonTemplate.clone();
-                            oContainer.addItem(oSkeleton);
+INSERT INTO "T1NFRP_NFRP_FINANCIALS_REPORTING_MASTER"
+("ID", "WIDGET", "QUERY")
+VALUES (
+3,
+'Underlying Profit',
+'WITH
+UNDERLYING_PROFIT_BASE AS (
+    SELECT
+        A.DATA_TYPE,
+        A.T_VERSION,
+        A.MONTH_ABR,
+        A.CFX,
+        A.RFX,
+        D.ADD6,
+        D.ADD16,
+        D.ADD17,
+        D.ADD18
+    FROM "T1NFRP_PHY"."CV_UP_NFRP_ALLDATA"  A
+    JOIN "T1NFRP_PHY"."TBL_NFRP_DATE_CONFIG" D ON A.E_PERIOD_DATE = D.E_PERIOD_DATE
+    WHERE A.M_ACCOUNT_0 = ''Operating Profit''
+    AND   A.T_REPORTING = ''CIB''
+    AND   D.FILTER_DATE = ''CURRENT_MONTH''
+    AND   D.FILTER_TYPE = ''PYR+CYR''
+),
+YTD_ACTUALS AS (
+    SELECT SUM(CFX) AS YTD_ACTUALS_CFX, SUM(RFX) AS YTD_ACTUALS_RFX
+    FROM UNDERLYING_PROFIT_BASE
+    WHERE DATA_TYPE = ''Actuals'' AND T_VERSION = ''YTD'' AND ADD16 = 0
+),
+VS_BUDGET AS (
+    SELECT
+        SUM(CASE WHEN DATA_TYPE = ''Actuals'' AND T_VERSION = ''YTD'' AND ADD16 = 0 THEN CFX ELSE 0 END) -
+        SUM(CASE WHEN DATA_TYPE = ''Budget''  AND T_VERSION = ''YTD'' AND ADD16 = 0 THEN CFX ELSE 0 END) AS VS_BUDGET_CFX,
+        SUM(CASE WHEN DATA_TYPE = ''Actuals'' AND T_VERSION = ''YTD'' AND ADD16 = 0 THEN RFX ELSE 0 END) -
+        SUM(CASE WHEN DATA_TYPE = ''Budget''  AND T_VERSION = ''YTD'' AND ADD16 = 0 THEN RFX ELSE 0 END) AS VS_BUDGET_RFX
+    FROM UNDERLYING_PROFIT_BASE
+    WHERE DATA_TYPE IN (''Actuals'',''Budget'') AND T_VERSION = ''YTD''
+),
+CY_PQ_ACTUALS AS (
+    SELECT SUM(CFX) AS CY_PQ_ACTUALS_CFX, SUM(RFX) AS CY_PQ_ACTUALS_RFX
+    FROM UNDERLYING_PROFIT_BASE
+    WHERE DATA_TYPE = ''Actuals'' AND T_VERSION = ''QTD'' AND ADD17 = -1
+),
+FY_OUTLOOK AS (
+    SELECT SUM(CFX) AS FY_OUTLOOK_CFX, SUM(RFX) AS FY_OUTLOOK_RFX
+    FROM UNDERLYING_PROFIT_BASE
+    WHERE DATA_TYPE = ''Outlook_PM'' AND T_VERSION = ''YTD'' AND MONTH_ABR = ''FY'' AND ADD18 = -1
+),
+PY_PQ_VARIANCE AS (
+    SELECT
+        SUM(CASE WHEN DATA_TYPE = ''Actuals'' AND T_VERSION = ''QTD'' AND ADD17 = -1 THEN CFX ELSE 0 END) -
+        SUM(CASE WHEN DATA_TYPE = ''Actuals'' AND T_VERSION = ''QTD'' AND ADD17 = -5 THEN CFX ELSE 0 END) AS PY_PQ_VARIANCE_CFX,
+        SUM(CASE WHEN DATA_TYPE = ''Actuals'' AND T_VERSION = ''QTD'' AND ADD17 = -1 THEN RFX ELSE 0 END) -
+        SUM(CASE WHEN DATA_TYPE = ''Actuals'' AND T_VERSION = ''QTD'' AND ADD17 = -5 THEN RFX ELSE 0 END) AS PY_PQ_VARIANCE_RFX
+    FROM UNDERLYING_PROFIT_BASE
+    WHERE DATA_TYPE = ''Actuals'' AND T_VERSION = ''QTD'' AND ADD17 IN (-1,-5)
+),
+YTD_ACTUAL_PY AS (
+    SELECT
+        SUM(CASE WHEN DATA_TYPE = ''Actuals'' AND T_VERSION = ''YTD'' AND ADD16 = 0       THEN CFX ELSE 0 END) -
+        SUM(CASE WHEN DATA_TYPE = ''Actuals'' AND T_VERSION = ''MTD'' AND ADD6 = ''PY_YTD'' THEN CFX ELSE 0 END) AS YTD_ACTUAL_PY_VARIANCE_CFX,
+        SUM(CASE WHEN DATA_TYPE = ''Actuals'' AND T_VERSION = ''YTD'' AND ADD16 = 0       THEN RFX ELSE 0 END) -
+        SUM(CASE WHEN DATA_TYPE = ''Actuals'' AND T_VERSION = ''MTD'' AND ADD6 = ''PY_YTD'' THEN RFX ELSE 0 END) AS YTD_ACTUAL_PY_VARIANCE_RFX
+    FROM UNDERLYING_PROFIT_BASE WHERE DATA_TYPE = ''Actuals''
+),
+FY_VS_YTD_ACTUAL_PY AS (
+    SELECT
+        SUM(CASE WHEN DATA_TYPE = ''Outlook_PM'' AND T_VERSION = ''YTD'' AND MONTH_ABR = ''FY'' AND ADD18 = -1    THEN CFX ELSE 0 END) -
+        SUM(CASE WHEN DATA_TYPE = ''Actuals''    AND T_VERSION = ''MTD'' AND ADD6 = ''PY_YTD''                   THEN CFX ELSE 0 END) AS FY_OUTLOOK_VS_YTD_ACTUAL_PY_CFX,
+        SUM(CASE WHEN DATA_TYPE = ''Outlook_PM'' AND T_VERSION = ''YTD'' AND MONTH_ABR = ''FY'' AND ADD18 = -1    THEN RFX ELSE 0 END) -
+        SUM(CASE WHEN DATA_TYPE = ''Actuals''    AND T_VERSION = ''MTD'' AND ADD6 = ''PY_YTD''                   THEN RFX ELSE 0 END) AS FY_OUTLOOK_VS_YTD_ACTUAL_PY_RFX
+    FROM UNDERLYING_PROFIT_BASE WHERE DATA_TYPE IN (''Outlook_PM'',''Actuals'')
+)
+SELECT
+    Y.YTD_ACTUALS_CFX, Y.YTD_ACTUALS_RFX,
+    B.VS_BUDGET_CFX,   B.VS_BUDGET_RFX,
+    C.CY_PQ_ACTUALS_CFX, C.CY_PQ_ACTUALS_RFX,
+    F.FY_OUTLOOK_CFX,  F.FY_OUTLOOK_RFX,
+    P.PY_PQ_VARIANCE_CFX, P.PY_PQ_VARIANCE_RFX,
+    V.YTD_ACTUAL_PY_VARIANCE_CFX, V.YTD_ACTUAL_PY_VARIANCE_RFX,
+    O.FY_OUTLOOK_VS_YTD_ACTUAL_PY_CFX, O.FY_OUTLOOK_VS_YTD_ACTUAL_PY_RFX
+FROM YTD_ACTUALS Y CROSS JOIN VS_BUDGET B CROSS JOIN CY_PQ_ACTUALS C
+CROSS JOIN FY_OUTLOOK F CROSS JOIN PY_PQ_VARIANCE P
+CROSS JOIN YTD_ACTUAL_PY V CROSS JOIN FY_VS_YTD_ACTUAL_PY O'
+);
 
-                            var oSinglePayload = Object.assign({}, oPayload, { widgetName: sWidgetName });
+-- ── 4. Funded Assets ─────────────────────────────────────
 
-                            var pSingleRequest = new Promise(function(resolve) {
-                                var tCardStart = performance.now();
+INSERT INTO "T1NFRP_NFRP_FINANCIALS_REPORTING_MASTER"
+("ID", "WIDGET", "QUERY")
+VALUES (
+4,
+'Funded Assets',
+'WITH
+FUNDED_ASSETS_BASE AS (
+    SELECT
+        A.DATA_TYPE,
+        A.T_VERSION,
+        A.MONTH_ABR,
+        A.CFX,
+        A.RFX,
+        D.ADD6,
+        D.ADD16,
+        D.ADD17,
+        D.ADD18
+    FROM "T1NFRP_PHY"."CV_UP_NFRP_ALLDATA"  A
+    JOIN "T1NFRP_PHY"."TBL_NFRP_DATE_CONFIG" D ON A.E_PERIOD_DATE = D.E_PERIOD_DATE
+    WHERE A.M_ACCOUNT_1 = ''Funded Assets''
+    AND   A.T_REPORTING = ''CIB''
+    AND   D.FILTER_DATE = ''CURRENT_MONTH''
+    AND   D.FILTER_TYPE = ''PYR+CYR''
+),
+YTD_ACTUALS AS (
+    SELECT SUM(CFX) AS YTD_ACTUALS_CFX, SUM(RFX) AS YTD_ACTUALS_RFX
+    FROM FUNDED_ASSETS_BASE
+    WHERE DATA_TYPE = ''Actuals'' AND T_VERSION = ''YTD'' AND ADD16 = 0
+),
+VS_BUDGET AS (
+    SELECT
+        SUM(CASE WHEN DATA_TYPE = ''Actuals'' AND T_VERSION = ''YTD'' AND ADD16 = 0 THEN CFX ELSE 0 END) -
+        SUM(CASE WHEN DATA_TYPE = ''Budget''  AND T_VERSION = ''YTD'' AND ADD16 = 0 THEN CFX ELSE 0 END) AS VS_BUDGET_CFX,
+        SUM(CASE WHEN DATA_TYPE = ''Actuals'' AND T_VERSION = ''YTD'' AND ADD16 = 0 THEN RFX ELSE 0 END) -
+        SUM(CASE WHEN DATA_TYPE = ''Budget''  AND T_VERSION = ''YTD'' AND ADD16 = 0 THEN RFX ELSE 0 END) AS VS_BUDGET_RFX
+    FROM FUNDED_ASSETS_BASE
+    WHERE DATA_TYPE IN (''Actuals'',''Budget'') AND T_VERSION = ''YTD''
+),
+CY_PQ_ACTUALS AS (
+    SELECT SUM(CFX) AS CY_PQ_ACTUALS_CFX, SUM(RFX) AS CY_PQ_ACTUALS_RFX
+    FROM FUNDED_ASSETS_BASE
+    WHERE DATA_TYPE = ''Actuals'' AND T_VERSION = ''QTD'' AND ADD17 = -1
+),
+FY_OUTLOOK AS (
+    SELECT SUM(CFX) AS FY_OUTLOOK_CFX, SUM(RFX) AS FY_OUTLOOK_RFX
+    FROM FUNDED_ASSETS_BASE
+    WHERE DATA_TYPE = ''Outlook_PM'' AND T_VERSION = ''YTD'' AND ADD18 = 0 AND ADD16 = 0
+),
+PY_PQ_VARIANCE AS (
+    SELECT
+        SUM(CASE WHEN DATA_TYPE = ''Actuals'' AND T_VERSION = ''QTD'' AND ADD17 = -1 THEN CFX ELSE 0 END) -
+        SUM(CASE WHEN DATA_TYPE = ''Actuals'' AND T_VERSION = ''QTD'' AND ADD17 = -5 THEN CFX ELSE 0 END) AS PY_PQ_VARIANCE_CFX,
+        SUM(CASE WHEN DATA_TYPE = ''Actuals'' AND T_VERSION = ''QTD'' AND ADD17 = -1 THEN RFX ELSE 0 END) -
+        SUM(CASE WHEN DATA_TYPE = ''Actuals'' AND T_VERSION = ''QTD'' AND ADD17 = -5 THEN RFX ELSE 0 END) AS PY_PQ_VARIANCE_RFX
+    FROM FUNDED_ASSETS_BASE
+    WHERE DATA_TYPE = ''Actuals'' AND T_VERSION = ''QTD'' AND ADD17 IN (-1,-5)
+),
+YTD_ACTUAL_PY AS (
+    SELECT
+        SUM(CASE WHEN DATA_TYPE = ''Actuals'' AND T_VERSION = ''YTD'' AND ADD16 = 0       THEN CFX ELSE 0 END) -
+        SUM(CASE WHEN DATA_TYPE = ''Actuals'' AND T_VERSION = ''MTD'' AND ADD6 = ''PY_YTD'' THEN CFX ELSE 0 END) AS YTD_ACTUAL_PY_VARIANCE_CFX,
+        SUM(CASE WHEN DATA_TYPE = ''Actuals'' AND T_VERSION = ''YTD'' AND ADD16 = 0       THEN RFX ELSE 0 END) -
+        SUM(CASE WHEN DATA_TYPE = ''Actuals'' AND T_VERSION = ''MTD'' AND ADD6 = ''PY_YTD'' THEN RFX ELSE 0 END) AS YTD_ACTUAL_PY_VARIANCE_RFX
+    FROM FUNDED_ASSETS_BASE WHERE DATA_TYPE = ''Actuals''
+),
+FY_VS_YTD_ACTUAL_PY AS (
+    SELECT
+        SUM(CASE WHEN DATA_TYPE = ''Outlook_PM'' AND T_VERSION = ''YTD'' AND ADD18 = 0 AND ADD16 = 0 THEN CFX ELSE 0 END) -
+        SUM(CASE WHEN DATA_TYPE = ''Actuals''    AND T_VERSION = ''MTD'' AND ADD6 = ''PY_YTD''       THEN CFX ELSE 0 END) AS FY_VS_YTD_ACTUAL_PY_CFX,
+        SUM(CASE WHEN DATA_TYPE = ''Outlook_PM'' AND T_VERSION = ''YTD'' AND ADD18 = 0 AND ADD16 = 0 THEN RFX ELSE 0 END) -
+        SUM(CASE WHEN DATA_TYPE = ''Actuals''    AND T_VERSION = ''MTD'' AND ADD6 = ''PY_YTD''       THEN RFX ELSE 0 END) AS FY_VS_YTD_ACTUAL_PY_RFX
+    FROM FUNDED_ASSETS_BASE WHERE DATA_TYPE IN (''Outlook_PM'',''Actuals'')
+)
+SELECT
+    Y.YTD_ACTUALS_CFX, Y.YTD_ACTUALS_RFX,
+    B.VS_BUDGET_CFX,   B.VS_BUDGET_RFX,
+    C.CY_PQ_ACTUALS_CFX, C.CY_PQ_ACTUALS_RFX,
+    F.FY_OUTLOOK_CFX,  F.FY_OUTLOOK_RFX,
+    P.PY_PQ_VARIANCE_CFX, P.PY_PQ_VARIANCE_RFX,
+    V.YTD_ACTUAL_PY_VARIANCE_CFX, V.YTD_ACTUAL_PY_VARIANCE_RFX,
+    O.FY_VS_YTD_ACTUAL_PY_CFX, O.FY_VS_YTD_ACTUAL_PY_RFX
+FROM YTD_ACTUALS Y CROSS JOIN VS_BUDGET B CROSS JOIN CY_PQ_ACTUALS C
+CROSS JOIN FY_OUTLOOK F CROSS JOIN PY_PQ_VARIANCE P
+CROSS JOIN YTD_ACTUAL_PY V CROSS JOIN FY_VS_YTD_ACTUAL_PY O'
+);
 
-                                $.ajax({
-                                    url: "/api/nrfp/getWidgetDataSingle", 
-                                    method: "POST",
-                                    contentType: "application/json",
-                                    data: JSON.stringify(oSinglePayload),
-                                    success: function (oWidgetResp) {
-                                        if (that._fetchId === iCurrentFetchId) {
-                                            var oResult = oWidgetResp.value || oWidgetResp;
-                                            
-                                            var tCardEnd = performance.now();
-                                            var nCardDuration = Math.round(tCardEnd - tCardStart);
-                                            console.log("⏱️ [Card] " + sWidgetName + " | Total UI Time: " + nCardDuration + "ms | Backend DB Time: " + oResult.durationMs + "ms");
+-- ── 5. RoTE ──────────────────────────────────────────────
 
-                                            if (oResult.status === "ok" && oResult.data) {
-                                                try {
-                                                    var oParsed = JSON.parse(oResult.data);
-                                                    var oCardData = oParsed[sCurrencyKey] || {};
-                                                    oCardData.widget = oParsed.widget;
+INSERT INTO "T1NFRP_NFRP_FINANCIALS_REPORTING_MASTER"
+("ID", "WIDGET", "QUERY")
+VALUES (
+5,
+'RoTE',
+'WITH
+ROTE_BASE AS (
+    SELECT
+        A.DATA_TYPE,
+        A.T_VERSION,
+        A.MONTH_ABR,
+        A.CFX_N,
+        A.RFX_N,
+        D.ADD9,
+        D.ADD16,
+        D.ADD17,
+        D.ADD18,
+        D.ADD19
+    FROM "T1NFRP_PHY"."CV_UP_NFRP_ALLRATIOS"  A
+    JOIN "T1NFRP_PHY"."TBL_NFRP_DATE_CONFIG"   D ON A.E_PERIOD_DATE = D.E_PERIOD_DATE
+    WHERE A.M_ACCOUNT_5 = ''RoTE %''
+    AND   A.T_REPORTING = ''CIB''
+    AND   D.FILTER_DATE = ''CURRENT_MONTH''
+    AND   D.FILTER_TYPE = ''PYR+CYR''
+),
+YTD_ACTUALS AS (
+    SELECT SUM(CFX_N) AS YTD_ACTUALS_CFX, SUM(RFX_N) AS YTD_ACTUALS_RFX
+    FROM ROTE_BASE
+    WHERE DATA_TYPE = ''Actuals'' AND T_VERSION = ''YTD'' AND ADD16 = 0
+),
+VS_BUDGET AS (
+    SELECT
+        SUM(CASE WHEN DATA_TYPE = ''Actuals'' AND T_VERSION = ''YTD'' AND ADD16 = 0 THEN CFX_N ELSE 0 END) -
+        SUM(CASE WHEN DATA_TYPE = ''Budget''  AND T_VERSION = ''YTD'' AND ADD16 = 0 THEN CFX_N ELSE 0 END) AS VS_BUDGET_CFX,
+        SUM(CASE WHEN DATA_TYPE = ''Actuals'' AND T_VERSION = ''YTD'' AND ADD16 = 0 THEN RFX_N ELSE 0 END) -
+        SUM(CASE WHEN DATA_TYPE = ''Budget''  AND T_VERSION = ''YTD'' AND ADD16 = 0 THEN RFX_N ELSE 0 END) AS VS_BUDGET_RFX
+    FROM ROTE_BASE
+    WHERE DATA_TYPE IN (''Actuals'',''Budget'') AND T_VERSION = ''YTD''
+),
+PQTR_ACTUALS AS (
+    SELECT SUM(CFX_N) AS PQTR_ACTUALS_CFX, SUM(RFX_N) AS PQTR_ACTUALS_RFX
+    FROM ROTE_BASE
+    WHERE DATA_TYPE = ''Actuals'' AND T_VERSION = ''QTD'' AND ADD17 = -1
+),
+FY_OUTLOOK AS (
+    SELECT SUM(CFX_N) AS FY_OUTLOOK_CFX, SUM(RFX_N) AS FY_OUTLOOK_RFX
+    FROM ROTE_BASE
+    WHERE DATA_TYPE = ''Outlook_PM'' AND T_VERSION = ''YTD'' AND MONTH_ABR = ''FY'' AND ADD18 = -1
+),
+FY_ACTPY AS (
+    SELECT
+        SUM(CASE WHEN DATA_TYPE = ''Outlook_PM'' AND T_VERSION = ''YTD'' AND MONTH_ABR = ''FY'' AND ADD18 = -1   THEN CFX_N ELSE 0 END) -
+        SUM(CASE WHEN DATA_TYPE = ''Actuals''    AND T_VERSION = ''YTD'' AND MONTH_ABR = ''FY'' AND ADD19 = ''PY'' THEN CFX_N ELSE 0 END) AS FY_ACTPY_VARIANCE_CFX,
+        SUM(CASE WHEN DATA_TYPE = ''Outlook_PM'' AND T_VERSION = ''YTD'' AND MONTH_ABR = ''FY'' AND ADD18 = -1   THEN RFX_N ELSE 0 END) -
+        SUM(CASE WHEN DATA_TYPE = ''Actuals''    AND T_VERSION = ''YTD'' AND MONTH_ABR = ''FY'' AND ADD19 = ''PY'' THEN RFX_N ELSE 0 END) AS FY_ACTPY_VARIANCE_RFX
+    FROM ROTE_BASE
+    WHERE DATA_TYPE IN (''Outlook_PM'',''Actuals'') AND T_VERSION = ''YTD''
+),
+PY_PQTR_ACTUALS AS (
+    SELECT
+        SUM(CASE WHEN DATA_TYPE = ''Actuals'' AND T_VERSION = ''QTD'' AND ADD17 = -1 THEN CFX_N ELSE 0 END) -
+        SUM(CASE WHEN DATA_TYPE = ''Actuals'' AND T_VERSION = ''QTD'' AND ADD17 = -5 THEN CFX_N ELSE 0 END) AS PY_PQTR_VARIANCE_CFX,
+        SUM(CASE WHEN DATA_TYPE = ''Actuals'' AND T_VERSION = ''QTD'' AND ADD17 = -1 THEN RFX_N ELSE 0 END) -
+        SUM(CASE WHEN DATA_TYPE = ''Actuals'' AND T_VERSION = ''QTD'' AND ADD17 = -5 THEN RFX_N ELSE 0 END) AS PY_PQTR_VARIANCE_RFX
+    FROM ROTE_BASE
+    WHERE DATA_TYPE = ''Actuals'' AND T_VERSION = ''QTD'' AND ADD17 IN (-1,-5)
+),
+PYYTD_ACTUALS AS (
+    SELECT
+        SUM(CASE WHEN DATA_TYPE = ''Actuals'' AND T_VERSION = ''YTD'' AND ADD16 = 0          THEN CFX_N ELSE 0 END) -
+        SUM(CASE WHEN DATA_TYPE = ''Actuals'' AND T_VERSION = ''YTD'' AND ADD9 = ''2025_M01'' THEN CFX_N ELSE 0 END) AS PYYTD_VARIANCE_CFX,
+        SUM(CASE WHEN DATA_TYPE = ''Actuals'' AND T_VERSION = ''YTD'' AND ADD16 = 0          THEN RFX_N ELSE 0 END) -
+        SUM(CASE WHEN DATA_TYPE = ''Actuals'' AND T_VERSION = ''YTD'' AND ADD9 = ''2025_M01'' THEN RFX_N ELSE 0 END) AS PYYTD_VARIANCE_RFX
+    FROM ROTE_BASE
+    WHERE DATA_TYPE = ''Actuals'' AND T_VERSION = ''YTD''
+)
+SELECT
+    Y.YTD_ACTUALS_CFX, Y.YTD_ACTUALS_RFX,
+    B.VS_BUDGET_CFX,   B.VS_BUDGET_RFX,
+    C.PQTR_ACTUALS_CFX, C.PQTR_ACTUALS_RFX,
+    F.FY_OUTLOOK_CFX,  F.FY_OUTLOOK_RFX,
+    A.FY_ACTPY_VARIANCE_CFX, A.FY_ACTPY_VARIANCE_RFX,
+    P.PY_PQTR_VARIANCE_CFX, P.PY_PQTR_VARIANCE_RFX,
+    V.PYYTD_VARIANCE_CFX, V.PYYTD_VARIANCE_RFX
+FROM YTD_ACTUALS Y CROSS JOIN VS_BUDGET B CROSS JOIN PQTR_ACTUALS C
+CROSS JOIN FY_OUTLOOK F CROSS JOIN FY_ACTPY A CROSS JOIN PY_PQTR_ACTUALS P
+CROSS JOIN PYYTD_ACTUALS V'
+);
 
-                                                    // ── CORRECTED LOGIC: Absolute to $m / $bn Unit Scaling ──
-                                                    var nDivisor = 1;
-                                                    var sCurrentUnit = oState.unit ? oState.unit.trim().toLowerCase() : "$m";
-                                                    
-                                                    // Determine the divisor based on the raw DB data
-                                                    if (sCurrentUnit === "$m" || sCurrentUnit === "m") {
-                                                        nDivisor = 1000000;       // Divide raw dollars by 1 Million
-                                                    } else if (sCurrentUnit === "$bn" || sCurrentUnit === "bn") {
-                                                        nDivisor = 1000000000;    // Divide raw dollars by 1 Billion
-                                                    }
+-- ── 6. Costs ─────────────────────────────────────────────
 
-                                                    if (nDivisor !== 1) {
-                                                        // Explicitly target ONLY the main numbers, leaving the YoY bracket values untouched
-                                                        var aScaleFields = ["ytdActuals", "vsBudget", "pqActuals", "fyOutlook"];
-                                                        
-                                                        aScaleFields.forEach(function (sField) {
-                                                            if (oCardData[sField] !== undefined) {
-                                                                var nVal = parseFloat(oCardData[sField]);
-                                                                if (!isNaN(nVal)) {
-                                                                    oCardData[sField] = (nVal / nDivisor).toFixed(2);
-                                                                }
-                                                            }
-                                                        });
-                                                    }
-                                                    // ── END LOGIC ──
+INSERT INTO "T1NFRP_NFRP_FINANCIALS_REPORTING_MASTER"
+("ID", "WIDGET", "QUERY")
+VALUES (
+6,
+'Costs',
+'SELECT
+  SUM(CASE WHEN alldata.DATA_TYPE = ''Actuals''    AND alldata.T_VERSION = ''YTD'' AND dateconfig.ADD16 = 0  THEN alldata.RFX ELSE 0 END) AS YTD_ACTUALS_RFX_FPNA,
+  SUM(CASE WHEN alldata.DATA_TYPE = ''Actuals''    AND alldata.T_VERSION = ''YTD'' AND dateconfig.ADD16 = 0  THEN alldata.CFX ELSE 0 END) AS YTD_ACTUALS_CFX_FPNA,
+  SUM(CASE WHEN alldata.DATA_TYPE = ''Actuals''    AND alldata.T_VERSION = ''YTD'' AND dateconfig.ADD16 = 0  THEN alldata.RFX ELSE 0 END)
+  - SUM(CASE WHEN alldata.DATA_TYPE = ''Budget''   AND alldata.T_VERSION = ''YTD'' AND dateconfig.ADD16 = 0  THEN alldata.RFX ELSE 0 END) AS VS_BUDGET_RFX_FPNA,
+  SUM(CASE WHEN alldata.DATA_TYPE = ''Actuals''    AND alldata.T_VERSION = ''YTD'' AND dateconfig.ADD16 = 0  THEN alldata.CFX ELSE 0 END)
+  - SUM(CASE WHEN alldata.DATA_TYPE = ''Budget''   AND alldata.T_VERSION = ''YTD'' AND dateconfig.ADD16 = 0  THEN alldata.CFX ELSE 0 END) AS VS_BUDGET_CFX_FPNA,
+  SUM(CASE WHEN alldata.DATA_TYPE = ''Actuals''    AND alldata.T_VERSION = ''QTD'' AND dateconfig.ADD17 = -1 THEN alldata.RFX ELSE 0 END) AS CY_PQ_ACTUALS_RFX_FPNA,
+  SUM(CASE WHEN alldata.DATA_TYPE = ''Actuals''    AND alldata.T_VERSION = ''QTD'' AND dateconfig.ADD17 = -1 THEN alldata.CFX ELSE 0 END) AS CY_PQ_ACTUALS_CFX_FPNA,
+  SUM(CASE WHEN alldata.DATA_TYPE = ''Outlook_PM'' AND alldata.T_VERSION = ''YTD'' AND dateconfig.ADD19 = ''CY'' AND alldata.MONTH_ABR = ''FY'' THEN alldata.RFX ELSE 0 END) AS FY_OUTLOOK_RFX_FPNA,
+  SUM(CASE WHEN alldata.DATA_TYPE = ''Outlook_PM'' AND alldata.T_VERSION = ''YTD'' AND dateconfig.ADD19 = ''CY'' AND alldata.MONTH_ABR = ''FY'' THEN alldata.CFX ELSE 0 END) AS FY_OUTLOOK_CFX_FPNA,
+  SUM(CASE WHEN dateconfig.ADD17 = -1 AND alldata.T_VERSION = ''QTD'' AND alldata.DATA_TYPE = ''Actuals'' THEN alldata.RFX ELSE 0 END)
+  - SUM(CASE WHEN dateconfig.ADD17 = -5 AND alldata.T_VERSION = ''QTD'' AND alldata.DATA_TYPE = ''Actuals'' THEN alldata.RFX ELSE 0 END) AS PY_PQ_ACTUALS_RFX_FPNA,
+  SUM(CASE WHEN dateconfig.ADD17 = -1 AND alldata.T_VERSION = ''QTD'' AND alldata.DATA_TYPE = ''Actuals'' THEN alldata.CFX ELSE 0 END)
+  - SUM(CASE WHEN dateconfig.ADD17 = -5 AND alldata.T_VERSION = ''QTD'' AND alldata.DATA_TYPE = ''Actuals'' THEN alldata.CFX ELSE 0 END) AS PY_PQ_ACTUALS_CFX_FPNA,
+  SUM(CASE WHEN dateconfig.ADD16 = 0 AND alldata.T_VERSION = ''YTD'' AND alldata.DATA_TYPE = ''Actuals'' THEN alldata.RFX ELSE 0 END)
+  - SUM(CASE WHEN dateconfig.ADD6 = ''PY_YTD'' AND alldata.T_VERSION = ''MTD'' AND alldata.DATA_TYPE = ''Actuals'' THEN alldata.RFX ELSE 0 END) AS YTD_ACTUAL_PY_RFX_FPNA,
+  SUM(CASE WHEN dateconfig.ADD16 = 0 AND alldata.T_VERSION = ''YTD'' AND alldata.DATA_TYPE = ''Actuals'' THEN alldata.CFX ELSE 0 END)
+  - SUM(CASE WHEN dateconfig.ADD6 = ''PY_YTD'' AND alldata.T_VERSION = ''MTD'' AND alldata.DATA_TYPE = ''Actuals'' THEN alldata.CFX ELSE 0 END) AS YTD_ACTUAL_PY_CFX_FPNA,
+  SUM(CASE WHEN alldata.DATA_TYPE = ''Outlook_PM'' AND alldata.T_VERSION = ''YTD'' AND dateconfig.ADD19 = ''CY'' AND alldata.MONTH_ABR = ''FY'' THEN alldata.RFX ELSE 0 END)
+  - SUM(CASE WHEN alldata.DATA_TYPE = ''Actuals''  AND alldata.T_VERSION = ''MTD'' AND dateconfig.ADD6 = ''PY_YTD'' THEN alldata.RFX ELSE 0 END) AS YTD_ACTUAL_PY2_RFX_FPNA,
+  SUM(CASE WHEN alldata.DATA_TYPE = ''Outlook_PM'' AND alldata.T_VERSION = ''YTD'' AND dateconfig.ADD19 = ''CY'' AND alldata.MONTH_ABR = ''FY'' THEN alldata.CFX ELSE 0 END)
+  - SUM(CASE WHEN alldata.DATA_TYPE = ''Actuals''  AND alldata.T_VERSION = ''MTD'' AND dateconfig.ADD6 = ''PY_YTD'' THEN alldata.CFX ELSE 0 END) AS YTD_ACTUAL_PY2_CFX_FPNA
+FROM "T1NFRP_PHY"."CV_UP_NFRP_ALLDATA" alldata
+INNER JOIN "T1NFRP_PHY"."TBL_NFRP_DATE_CONFIG" dateconfig
+  ON alldata.E_PERIOD_DATE = dateconfig.E_PERIOD_DATE
+WHERE alldata.T_REPORTING = ''FPNA''
+  AND alldata.M_ACCOUNT_0 = ''Total Cost''
+  AND dateconfig.FILTER_DATE = ''CURRENT_MONTH''
+  AND dateconfig.FILTER_TYPE = ''PYR+CYR''
+  AND (
+    (alldata.DATA_TYPE = ''Actuals''    AND alldata.T_VERSION = ''YTD'' AND dateconfig.ADD16 = 0)
+    OR (alldata.DATA_TYPE = ''Budget''  AND alldata.T_VERSION = ''YTD'' AND dateconfig.ADD16 = 0)
+    OR (alldata.DATA_TYPE = ''Actuals'' AND alldata.T_VERSION = ''QTD'' AND dateconfig.ADD17 = -1)
+    OR (alldata.DATA_TYPE = ''Outlook_PM'' AND alldata.T_VERSION = ''YTD'' AND dateconfig.ADD19 = ''CY'' AND alldata.MONTH_ABR = ''FY'')
+    OR (dateconfig.ADD17 = -5 AND alldata.T_VERSION = ''QTD'' AND alldata.DATA_TYPE = ''Actuals'')
+    OR (dateconfig.ADD6 = ''PY_YTD'' AND alldata.T_VERSION = ''MTD'' AND alldata.DATA_TYPE = ''Actuals'')
+    OR (alldata.DATA_TYPE = ''Actuals'' AND alldata.T_VERSION = ''MTD'' AND dateconfig.ADD6 = ''PY_YTD'')
+  )'
+);
 
-                                                    var oCard = that._oKpiCardTemplate.clone();
-                                                    var oCardModel = new sap.ui.model.json.JSONModel(oCardData);
-                                                    oCard.setModel(oCardModel, "card");
+-- ── 7. NII ───────────────────────────────────────────────
 
-                                                    var iIndex = oContainer.indexOfItem(oSkeleton);
-                                                    if (iIndex !== -1) {
-                                                        oContainer.removeItem(oSkeleton);
-                                                        oContainer.insertItem(oCard, iIndex);
-                                                        oSkeleton.destroy(); 
-                                                    }
-                                                } catch (e) {
-                                                    console.error("JSON parsing failed for widget:", sWidgetName, e);
-                                                }
-                                            }
-                                        }
-                                        resolve(); 
-                                    },
-                                    error: function () {
-                                        console.error("Failed to fetch data for:", sWidgetName);
-                                        resolve(); 
-                                    }
-                                });
-                            });
+INSERT INTO "T1NFRP_NFRP_FINANCIALS_REPORTING_MASTER"
+("ID", "WIDGET", "QUERY")
+VALUES (
+7,
+'NII',
+'SELECT
+  SUM(CASE WHEN alldata.DATA_TYPE = ''Actuals''    AND alldata.T_VERSION = ''YTD'' AND dateconfig.ADD16 = 0  THEN alldata.RFX ELSE 0 END) AS YTD_ACTUALS_RFX_FPNA,
+  SUM(CASE WHEN alldata.DATA_TYPE = ''Actuals''    AND alldata.T_VERSION = ''YTD'' AND dateconfig.ADD16 = 0  THEN alldata.CFX ELSE 0 END) AS YTD_ACTUALS_CFX_FPNA,
+  SUM(CASE WHEN alldata.DATA_TYPE = ''Actuals''    AND alldata.T_VERSION = ''YTD'' AND dateconfig.ADD16 = 0  THEN alldata.RFX ELSE 0 END)
+  - SUM(CASE WHEN alldata.DATA_TYPE = ''Budget''   AND alldata.T_VERSION = ''YTD'' AND dateconfig.ADD16 = 0  THEN alldata.RFX ELSE 0 END) AS VS_BUDGET_RFX_FPNA,
+  SUM(CASE WHEN alldata.DATA_TYPE = ''Actuals''    AND alldata.T_VERSION = ''YTD'' AND dateconfig.ADD16 = 0  THEN alldata.CFX ELSE 0 END)
+  - SUM(CASE WHEN alldata.DATA_TYPE = ''Budget''   AND alldata.T_VERSION = ''YTD'' AND dateconfig.ADD16 = 0  THEN alldata.CFX ELSE 0 END) AS VS_BUDGET_CFX_FPNA,
+  SUM(CASE WHEN alldata.DATA_TYPE = ''Actuals''    AND alldata.T_VERSION = ''QTD'' AND dateconfig.ADD17 = -1 THEN alldata.RFX ELSE 0 END) AS PQTD_ACTUALS_RFX_FPNA,
+  SUM(CASE WHEN alldata.DATA_TYPE = ''Actuals''    AND alldata.T_VERSION = ''QTD'' AND dateconfig.ADD17 = -1 THEN alldata.CFX ELSE 0 END) AS PQTD_ACTUALS_CFX_FPNA,
+  SUM(CASE WHEN alldata.DATA_TYPE = ''Outlook_PM'' AND alldata.T_VERSION = ''YTD'' AND dateconfig.ADD19 = ''CY'' AND alldata.MONTH_ABR = ''FY'' THEN alldata.RFX ELSE 0 END) AS FY_OUTLOOK_RFX_FPNA,
+  SUM(CASE WHEN alldata.DATA_TYPE = ''Outlook_PM'' AND alldata.T_VERSION = ''YTD'' AND dateconfig.ADD19 = ''CY'' AND alldata.MONTH_ABR = ''FY'' THEN alldata.CFX ELSE 0 END) AS FY_OUTLOOK_CFX_FPNA,
+  SUM(CASE WHEN dateconfig.ADD16 = 0 AND alldata.T_VERSION = ''YTD'' AND alldata.DATA_TYPE = ''Actuals'' THEN alldata.RFX ELSE 0 END)
+  - SUM(CASE WHEN dateconfig.ADD6 = ''PY_YTD'' AND alldata.T_VERSION = ''MTD'' AND alldata.DATA_TYPE = ''Actuals'' THEN alldata.RFX ELSE 0 END) AS VARIANCE_YTD_ACTUAL_PY_RFX_FPNA,
+  SUM(CASE WHEN dateconfig.ADD16 = 0 AND alldata.T_VERSION = ''YTD'' AND alldata.DATA_TYPE = ''Actuals'' THEN alldata.CFX ELSE 0 END)
+  - SUM(CASE WHEN dateconfig.ADD6 = ''PY_YTD'' AND alldata.T_VERSION = ''MTD'' AND alldata.DATA_TYPE = ''Actuals'' THEN alldata.CFX ELSE 0 END) AS VARIANCE_YTD_ACTUAL_PY_CFX_FPNA,
+  SUM(CASE WHEN dateconfig.ADD17 = -1 AND alldata.T_VERSION = ''QTD'' AND alldata.DATA_TYPE = ''Actuals'' THEN alldata.RFX ELSE 0 END)
+  - SUM(CASE WHEN dateconfig.ADD17 = -5 AND alldata.T_VERSION = ''QTD'' AND alldata.DATA_TYPE = ''Actuals'' THEN alldata.RFX ELSE 0 END) AS PY_PQ_ACTUALS_RFX_FPNA,
+  SUM(CASE WHEN dateconfig.ADD17 = -1 AND alldata.T_VERSION = ''QTD'' AND alldata.DATA_TYPE = ''Actuals'' THEN alldata.CFX ELSE 0 END)
+  - SUM(CASE WHEN dateconfig.ADD17 = -5 AND alldata.T_VERSION = ''QTD'' AND alldata.DATA_TYPE = ''Actuals'' THEN alldata.CFX ELSE 0 END) AS PY_PQ_ACTUALS_CFX_FPNA,
+  SUM(CASE WHEN alldata.DATA_TYPE = ''Outlook_PM'' AND alldata.T_VERSION = ''YTD'' AND dateconfig.ADD19 = ''CY'' AND alldata.MONTH_ABR = ''FY'' THEN alldata.RFX ELSE 0 END)
+  - SUM(CASE WHEN alldata.DATA_TYPE = ''Actuals''  AND alldata.T_VERSION = ''MTD'' AND dateconfig.ADD6 = ''PY_YTD'' THEN alldata.RFX ELSE 0 END) AS PY_YTD_ACTUALS_RFX_FPNA,
+  SUM(CASE WHEN alldata.DATA_TYPE = ''Outlook_PM'' AND alldata.T_VERSION = ''YTD'' AND dateconfig.ADD19 = ''CY'' AND alldata.MONTH_ABR = ''FY'' THEN alldata.CFX ELSE 0 END)
+  - SUM(CASE WHEN alldata.DATA_TYPE = ''Actuals''  AND alldata.T_VERSION = ''MTD'' AND dateconfig.ADD6 = ''PY_YTD'' THEN alldata.CFX ELSE 0 END) AS PY_YTD_ACTUALS_CFX_FPNA
+FROM "T1NFRP_PHY"."CV_UP_NFRP_ALLDATA" alldata
+INNER JOIN "T1NFRP_PHY"."TBL_NFRP_DATE_CONFIG" dateconfig
+  ON alldata.E_PERIOD_DATE = dateconfig.E_PERIOD_DATE
+WHERE alldata.T_REPORTING = ''FPNA''
+  AND alldata.M_ACCOUNT_0 = ''Income''
+  AND alldata.M_ACCOUNT_1 = ''Net Interest Income''
+  AND dateconfig.FILTER_DATE = ''CURRENT_MONTH''
+  AND dateconfig.FILTER_TYPE = ''PYR+CYR''
+  AND (
+    (alldata.DATA_TYPE = ''Actuals''    AND alldata.T_VERSION = ''YTD'' AND dateconfig.ADD16 = 0)
+    OR (alldata.DATA_TYPE = ''Budget''  AND alldata.T_VERSION = ''YTD'' AND dateconfig.ADD16 = 0)
+    OR (alldata.DATA_TYPE = ''Actuals'' AND alldata.T_VERSION = ''QTD'' AND dateconfig.ADD17 = -1)
+    OR (alldata.DATA_TYPE = ''Outlook_PM'' AND alldata.T_VERSION = ''YTD'' AND dateconfig.ADD19 = ''CY'' AND alldata.MONTH_ABR = ''FY'')
+    OR (dateconfig.ADD6 = ''PY_YTD'' AND alldata.T_VERSION = ''MTD'' AND alldata.DATA_TYPE = ''Actuals'')
+    OR (dateconfig.ADD17 = -5 AND alldata.T_VERSION = ''QTD'' AND alldata.DATA_TYPE = ''Actuals'')
+    OR (alldata.DATA_TYPE = ''Actuals'' AND alldata.T_VERSION = ''MTD'' AND dateconfig.ADD6 = ''PY_YTD'')
+  )'
+);
 
-                            aPromises.push(pSingleRequest); 
-                        });
+-- ── 8. First RWA ─────────────────────────────────────────
 
-                        Promise.all(aPromises).then(function() {
-                            if (that._fetchId === iCurrentFetchId) {
-                                var tDashboardEnd = performance.now();
-                                var nTotalDuration = Math.round(tDashboardEnd - tDashboardStart);
-                                console.log("🚀 [DASHBOARD] All cards fully loaded! Total time: " + nTotalDuration + "ms");
-                            }
-                        });
-                    }
-                });
-            });
-        },
+INSERT INTO "T1NFRP_NFRP_FINANCIALS_REPORTING_MASTER"
+("ID", "WIDGET", "QUERY")
+VALUES (
+8,
+'First RWA',
+'SELECT
+  SUM(CASE WHEN alldata.DATA_TYPE = ''Actuals''    AND alldata.T_VERSION = ''YTD'' AND dateconfig.ADD16 = 0  THEN alldata.RFX ELSE 0 END) AS YTD_ACTUALS_RFX_FPNA,
+  SUM(CASE WHEN alldata.DATA_TYPE = ''Actuals''    AND alldata.T_VERSION = ''YTD'' AND dateconfig.ADD16 = 0  THEN alldata.CFX ELSE 0 END) AS YTD_ACTUALS_CFX_FPNA,
+  SUM(CASE WHEN alldata.DATA_TYPE = ''Actuals''    AND alldata.T_VERSION = ''YTD'' AND dateconfig.ADD16 = 0  THEN alldata.RFX ELSE 0 END)
+  - SUM(CASE WHEN alldata.DATA_TYPE = ''Budget''   AND alldata.T_VERSION = ''YTD'' AND dateconfig.ADD16 = 0  THEN alldata.RFX ELSE 0 END) AS VS_BUDGET_RFX_FPNA,
+  SUM(CASE WHEN alldata.DATA_TYPE = ''Actuals''    AND alldata.T_VERSION = ''YTD'' AND dateconfig.ADD16 = 0  THEN alldata.CFX ELSE 0 END)
+  - SUM(CASE WHEN alldata.DATA_TYPE = ''Budget''   AND alldata.T_VERSION = ''YTD'' AND dateconfig.ADD16 = 0  THEN alldata.CFX ELSE 0 END) AS VS_BUDGET_CFX_FPNA,
+  SUM(CASE WHEN alldata.DATA_TYPE = ''Actuals''    AND alldata.T_VERSION = ''QTD'' AND dateconfig.ADD17 = -1 THEN alldata.RFX ELSE 0 END) AS CY_PQ_ACTUALS_RFX_FPNA,
+  SUM(CASE WHEN alldata.DATA_TYPE = ''Actuals''    AND alldata.T_VERSION = ''QTD'' AND dateconfig.ADD17 = -1 THEN alldata.CFX ELSE 0 END) AS CY_PQ_ACTUALS_CFX_FPNA,
+  SUM(CASE WHEN alldata.DATA_TYPE = ''Outlook_PM'' AND alldata.T_VERSION = ''YTD'' AND dateconfig.ADD19 = ''CY'' AND alldata.MONTH_ABR = ''FY'' THEN alldata.RFX ELSE 0 END) AS FY_OUTLOOK_RFX_FPNA,
+  SUM(CASE WHEN alldata.DATA_TYPE = ''Outlook_PM'' AND alldata.T_VERSION = ''YTD'' AND dateconfig.ADD19 = ''CY'' AND alldata.MONTH_ABR = ''FY'' THEN alldata.CFX ELSE 0 END) AS FY_OUTLOOK_CFX_FPNA,
+  SUM(CASE WHEN dateconfig.ADD17 = -1 AND alldata.T_VERSION = ''QTD'' AND alldata.DATA_TYPE = ''Actuals'' THEN alldata.RFX ELSE 0 END)
+  - SUM(CASE WHEN dateconfig.ADD17 = -5 AND alldata.T_VERSION = ''QTD'' AND alldata.DATA_TYPE = ''Actuals'' THEN alldata.RFX ELSE 0 END) AS PY_PQ_ACTUALS_RFX_FPNA,
+  SUM(CASE WHEN dateconfig.ADD17 = -1 AND alldata.T_VERSION = ''QTD'' AND alldata.DATA_TYPE = ''Actuals'' THEN alldata.CFX ELSE 0 END)
+  - SUM(CASE WHEN dateconfig.ADD17 = -5 AND alldata.T_VERSION = ''QTD'' AND alldata.DATA_TYPE = ''Actuals'' THEN alldata.CFX ELSE 0 END) AS PY_PQ_ACTUALS_CFX_FPNA,
+  SUM(CASE WHEN dateconfig.ADD16 = 0 AND alldata.T_VERSION = ''YTD'' AND alldata.DATA_TYPE = ''Actuals'' THEN alldata.RFX ELSE 0 END)
+  - SUM(CASE WHEN dateconfig.ADD6 = ''PY_YTD'' AND alldata.T_VERSION = ''MTD'' AND alldata.DATA_TYPE = ''Actuals'' THEN alldata.RFX ELSE 0 END) AS YTD_ACTUAL_PY_RFX_FPNA,
+  SUM(CASE WHEN dateconfig.ADD16 = 0 AND alldata.T_VERSION = ''YTD'' AND alldata.DATA_TYPE = ''Actuals'' THEN alldata.CFX ELSE 0 END)
+  - SUM(CASE WHEN dateconfig.ADD6 = ''PY_YTD'' AND alldata.T_VERSION = ''MTD'' AND alldata.DATA_TYPE = ''Actuals'' THEN alldata.CFX ELSE 0 END) AS YTD_ACTUAL_PY_CFX_FPNA,
+  SUM(CASE WHEN alldata.DATA_TYPE = ''Outlook_PM'' AND alldata.T_VERSION = ''YTD'' AND dateconfig.ADD19 = ''CY'' AND alldata.MONTH_ABR = ''FY'' THEN alldata.RFX ELSE 0 END)
+  - SUM(CASE WHEN alldata.DATA_TYPE = ''Actuals''  AND alldata.T_VERSION = ''MTD'' AND dateconfig.ADD6 = ''PY_YTD'' THEN alldata.RFX ELSE 0 END) AS YTD_ACTUAL_PY2_RFX_FPNA,
+  SUM(CASE WHEN alldata.DATA_TYPE = ''Outlook_PM'' AND alldata.T_VERSION = ''YTD'' AND dateconfig.ADD19 = ''CY'' AND alldata.MONTH_ABR = ''FY'' THEN alldata.CFX ELSE 0 END)
+  - SUM(CASE WHEN alldata.DATA_TYPE = ''Actuals''  AND alldata.T_VERSION = ''MTD'' AND dateconfig.ADD6 = ''PY_YTD'' THEN alldata.CFX ELSE 0 END) AS YTD_ACTUAL_PY2_CFX_FPNA
+FROM "T1NFRP_PHY"."CV_UP_NFRP_ALLDATA" alldata
+INNER JOIN "T1NFRP_PHY"."TBL_NFRP_DATE_CONFIG" dateconfig
+  ON alldata.E_PERIOD_DATE = dateconfig.E_PERIOD_DATE
+WHERE alldata.T_REPORTING = ''FPNA''
+  AND alldata.M_ACCOUNT_1 = ''Funded Liabilities''
+  AND dateconfig.FILTER_DATE = ''CURRENT_MONTH''
+  AND dateconfig.FILTER_TYPE = ''PYR+CYR''
+  AND (
+    (alldata.DATA_TYPE = ''Actuals''    AND alldata.T_VERSION = ''YTD'' AND dateconfig.ADD16 = 0)
+    OR (alldata.DATA_TYPE = ''Budget''  AND alldata.T_VERSION = ''YTD'' AND dateconfig.ADD16 = 0)
+    OR (alldata.DATA_TYPE = ''Actuals'' AND alldata.T_VERSION = ''QTD'' AND dateconfig.ADD17 = -1)
+    OR (alldata.DATA_TYPE = ''Outlook_PM'' AND alldata.T_VERSION = ''YTD'' AND dateconfig.ADD19 = ''CY'' AND alldata.MONTH_ABR = ''FY'')
+    OR (dateconfig.ADD17 = -5 AND alldata.T_VERSION = ''QTD'' AND alldata.DATA_TYPE = ''Actuals'')
+    OR (dateconfig.ADD6 = ''PY_YTD'' AND alldata.T_VERSION = ''MTD'' AND alldata.DATA_TYPE = ''Actuals'')
+    OR (alldata.DATA_TYPE = ''Actuals'' AND alldata.T_VERSION = ''MTD'' AND dateconfig.ADD6 = ''PY_YTD'')
+  )'
+);
 
-        _loadAndRenderECharts: function () {
-            if (window.echarts) {
-                this._renderChart();
-                return;
-            }
-            var oScript    = document.createElement("script");
-            oScript.src    = "https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js";
-            oScript.onload = function () {
-                this._renderChart();
-            }.bind(this);
-            document.head.appendChild(oScript);
-        },
+-- ── 9. JAWS ──────────────────────────────────────────────
 
-        _renderChart: function () {
-            var sDomId = this.getView().getId() + "--echartsContainer";
-            var oDom   = document.getElementById(sDomId);
-            if (!oDom || !this._chartData) return;
+INSERT INTO "T1NFRP_NFRP_FINANCIALS_REPORTING_MASTER"
+("ID", "WIDGET", "QUERY")
+VALUES (
+9,
+'JAWS',
+'WITH DATA_ANCHOR AS (
+    SELECT MAX(A.E_PERIOD_DATE) AS ACTUALS_YTD_DATE
+    FROM T1NFRP_PHY."CV_UP_NFRP_ALLDATA" A
+    WHERE A.M_ACCOUNT_5 = ''Software''
+    AND   A.T_REPORTING = ''FPNA''
+    AND   A.DATA_TYPE   = ''Actuals''
+    AND   A.T_VERSION   = ''YTD''
+    AND   A.CFX        != 0
+    AND EXISTS (
+        SELECT 1 FROM T1NFRP_PHY."TBL_NFRP_DATE_CONFIG" D
+        WHERE D.FILTER_DATE = TO_VARCHAR(A.E_PERIOD_DATE, ''YYYY-MM-DD'')
+    )
+),
+PERIODS AS (
+    SELECT
+        MAX(CASE WHEN D.ADD16 = ''0''                         THEN D.E_PERIOD_DATE END) AS CURRENT_YTD_PERIOD,
+        MAX(CASE WHEN D.ADD16 = ''-12''                       THEN D.E_PERIOD_DATE END) AS PYYTD_PERIOD,
+        MAX(CASE WHEN D.ADD17 = ''-1'' AND D.ADD19 = ''CY''   THEN D.E_PERIOD_DATE END) AS PREV_QTR_PERIOD,
+        MAX(CASE WHEN D.ADD17 = ''-5'' AND D.ADD19 = ''PY''   THEN D.E_PERIOD_DATE END) AS PYPQTR_PERIOD
+    FROM T1NFRP_PHY."TBL_NFRP_DATE_CONFIG" D
+    CROSS JOIN DATA_ANCHOR A
+    WHERE D.FILTER_DATE = TO_VARCHAR(A.ACTUALS_YTD_DATE, ''YYYY-MM-DD'')
+),
+FY_ANCHOR AS (
+    SELECT MAX(E_PERIOD_DATE) AS FY_ACTPY_PERIOD
+    FROM T1NFRP_PHY."CV_UP_NFRP_ALLDATA"
+    WHERE M_ACCOUNT_5 = ''Software'' AND T_REPORTING = ''FPNA''
+    AND   DATA_TYPE = ''Actuals'' AND T_VERSION = ''YTD'' AND MONTH_ABR = ''FY''
+),
+FY_OUTLOOK_ANCHOR AS (
+    SELECT MAX(E_PERIOD_DATE) AS FY_OUTLOOK_PERIOD
+    FROM T1NFRP_PHY."CV_UP_NFRP_ALLDATA"
+    WHERE M_ACCOUNT_5 = ''Software'' AND E_BOOKS = ''NEWF - OL''
+    AND   T_REPORTING = ''FPNA'' AND DATA_TYPE = ''Outlook_PM'' AND T_VERSION = ''YTD''
+),
+PERIOD_SET AS (
+    SELECT P.CURRENT_YTD_PERIOD, P.PYYTD_PERIOD, P.PREV_QTR_PERIOD, P.PYPQTR_PERIOD,
+           FA.FY_ACTPY_PERIOD, OA.FY_OUTLOOK_PERIOD
+    FROM PERIODS P CROSS JOIN FY_ANCHOR FA CROSS JOIN FY_OUTLOOK_ANCHOR OA
+),
+ALL_MEASURES AS (
+    SELECT
+        SUM(CASE WHEN A.DATA_TYPE=''Actuals''   AND A.T_VERSION=''YTD'' AND A.E_PERIOD_DATE=PS.CURRENT_YTD_PERIOD THEN A.CFX ELSE 0 END) AS YTD_ACTUALS_CFX,
+        SUM(CASE WHEN A.DATA_TYPE=''Budget''    AND A.T_VERSION=''YTD'' AND A.E_PERIOD_DATE=PS.CURRENT_YTD_PERIOD THEN A.CFX ELSE 0 END) AS RBUDYTD_CFX,
+        SUM(CASE WHEN A.DATA_TYPE=''Actuals''   AND A.T_VERSION=''QTD'' AND A.E_PERIOD_DATE=PS.PREV_QTR_PERIOD    THEN A.CFX ELSE 0 END) AS PQTR_ACTUALS_CFX,
+        SUM(CASE WHEN A.DATA_TYPE=''Outlook_PM'' AND A.T_VERSION=''YTD'' AND A.E_BOOKS=''NEWF - OL'' AND A.E_PERIOD_DATE=PS.FY_OUTLOOK_PERIOD THEN A.CFX ELSE 0 END) AS FY_OUTLOOK_CFX,
+        SUM(CASE WHEN A.DATA_TYPE=''Actuals''   AND A.T_VERSION=''YTD'' AND A.MONTH_ABR=''FY'' AND A.E_PERIOD_DATE=PS.FY_ACTPY_PERIOD   THEN A.CFX ELSE 0 END) AS FY_ACTPY_CFX,
+        SUM(CASE WHEN A.DATA_TYPE=''Actuals''   AND A.T_VERSION=''YTD'' AND A.E_PERIOD_DATE=PS.PYYTD_PERIOD       THEN A.CFX ELSE 0 END) AS PYYTD_ACTUALS_CFX,
+        SUM(CASE WHEN A.DATA_TYPE=''Actuals''   AND A.T_VERSION=''QTD'' AND A.E_PERIOD_DATE=PS.PYPQTR_PERIOD      THEN A.CFX ELSE 0 END) AS PYPQTR_ACTUALS_CFX,
+        SUM(CASE WHEN A.DATA_TYPE=''Actuals''   AND A.T_VERSION=''YTD'' AND A.E_PERIOD_DATE=PS.CURRENT_YTD_PERIOD THEN A.RFX ELSE 0 END) AS YTD_ACTUALS_RFX,
+        SUM(CASE WHEN A.DATA_TYPE=''Budget''    AND A.T_VERSION=''YTD'' AND A.E_PERIOD_DATE=PS.CURRENT_YTD_PERIOD THEN A.RFX ELSE 0 END) AS RBUDYTD_RFX,
+        SUM(CASE WHEN A.DATA_TYPE=''Actuals''   AND A.T_VERSION=''QTD'' AND A.E_PERIOD_DATE=PS.PREV_QTR_PERIOD    THEN A.RFX ELSE 0 END) AS PQTR_ACTUALS_RFX,
+        SUM(CASE WHEN A.DATA_TYPE=''Outlook_PM'' AND A.T_VERSION=''YTD'' AND A.E_BOOKS=''NEWF - OL'' AND A.E_PERIOD_DATE=PS.FY_OUTLOOK_PERIOD THEN A.RFX ELSE 0 END) AS FY_OUTLOOK_RFX,
+        SUM(CASE WHEN A.DATA_TYPE=''Actuals''   AND A.T_VERSION=''YTD'' AND A.MONTH_ABR=''FY'' AND A.E_PERIOD_DATE=PS.FY_ACTPY_PERIOD   THEN A.RFX ELSE 0 END) AS FY_ACTPY_RFX,
+        SUM(CASE WHEN A.DATA_TYPE=''Actuals''   AND A.T_VERSION=''YTD'' AND A.E_PERIOD_DATE=PS.PYYTD_PERIOD       THEN A.RFX ELSE 0 END) AS PYYTD_ACTUALS_RFX,
+        SUM(CASE WHEN A.DATA_TYPE=''Actuals''   AND A.T_VERSION=''QTD'' AND A.E_PERIOD_DATE=PS.PYPQTR_PERIOD      THEN A.RFX ELSE 0 END) AS PYPQTR_ACTUALS_RFX
+    FROM T1NFRP_PHY."CV_UP_NFRP_ALLDATA" A CROSS JOIN PERIOD_SET PS
+    WHERE A.M_ACCOUNT_5 = ''Software'' AND A.T_REPORTING = ''FPNA''
+    AND A.E_PERIOD_DATE IN (PS.CURRENT_YTD_PERIOD,PS.PYYTD_PERIOD,PS.PREV_QTR_PERIOD,PS.PYPQTR_PERIOD,PS.FY_ACTPY_PERIOD,PS.FY_OUTLOOK_PERIOD)
+)
+SELECT
+    M.YTD_ACTUALS_CFX,
+    (M.YTD_ACTUALS_CFX  - M.RBUDYTD_CFX)        AS VS_BUDGET_CFX,
+    M.PQTR_ACTUALS_CFX,
+    M.FY_OUTLOOK_CFX,
+    (M.FY_OUTLOOK_CFX   - M.FY_ACTPY_CFX)       AS VAR_FY_ACTPY_CFX,
+    (M.PQTR_ACTUALS_CFX - M.PYPQTR_ACTUALS_CFX) AS VAR_PYPQTR_CFX,
+    (M.YTD_ACTUALS_CFX  - M.PYYTD_ACTUALS_CFX)  AS VAR_PYYTD_CFX,
+    M.YTD_ACTUALS_RFX,
+    (M.YTD_ACTUALS_RFX  - M.RBUDYTD_RFX)        AS VS_BUDGET_RFX,
+    M.PQTR_ACTUALS_RFX,
+    M.FY_OUTLOOK_RFX,
+    (M.FY_OUTLOOK_RFX   - M.FY_ACTPY_RFX)       AS VAR_FY_ACTPY_RFX,
+    (M.PQTR_ACTUALS_RFX - M.PYPQTR_ACTUALS_RFX) AS VAR_PYPQTR_RFX,
+    (M.YTD_ACTUALS_RFX  - M.PYYTD_ACTUALS_RFX)  AS VAR_PYYTD_RFX
+FROM PERIOD_SET PS CROSS JOIN ALL_MEASURES M'
+);
 
-            var oExisting = window.echarts.getInstanceByDom(oDom);
-            if (oExisting) oExisting.dispose();
+-- ── 10. CIR ───────────────────────────────────────────────
 
-            var oChart = echarts.init(oDom);
-            var aData  = this._chartData;
+INSERT INTO "T1NFRP_NFRP_FINANCIALS_REPORTING_MASTER"
+("ID", "WIDGET", "QUERY")
+VALUES (
+10,
+'CIR',
+'WITH DATA_ANCHOR AS (
+    SELECT MAX(R.E_PERIOD_DATE) AS ACTUALS_YTD_DATE
+    FROM T1NFRP_PHY."CV_UP_NFRP_ALLRATIOS" R
+    WHERE R.M_ACCOUNT_5 LIKE ''CIR %''
+    AND   R.T_REPORTING = ''FPNA''
+    AND   R.DATA_TYPE   = ''Actuals''
+    AND   R.T_VERSION   = ''YTD''
+    AND   R.CFX_N      != 0
+    AND EXISTS (
+        SELECT 1 FROM T1NFRP_PHY."TBL_NFRP_DATE_CONFIG" D
+        WHERE D.FILTER_DATE = TO_VARCHAR(R.E_PERIOD_DATE, ''YYYY-MM-DD'')
+    )
+),
+PERIODS AS (
+    SELECT
+        MAX(CASE WHEN D.ADD16 = ''0''                         THEN D.E_PERIOD_DATE END) AS CURRENT_YTD_PERIOD,
+        MAX(CASE WHEN D.ADD16 = ''-12''                       THEN D.E_PERIOD_DATE END) AS PYYTD_PERIOD,
+        MAX(CASE WHEN D.ADD17 = ''-1'' AND D.ADD19 = ''CY''   THEN D.E_PERIOD_DATE END) AS PREV_QTR_PERIOD,
+        MAX(CASE WHEN D.ADD17 = ''-5'' AND D.ADD19 = ''PY''   THEN D.E_PERIOD_DATE END) AS PYPQTR_PERIOD
+    FROM T1NFRP_PHY."TBL_NFRP_DATE_CONFIG" D
+    CROSS JOIN DATA_ANCHOR A
+    WHERE D.FILTER_DATE = TO_VARCHAR(A.ACTUALS_YTD_DATE, ''YYYY-MM-DD'')
+),
+FY_ANCHOR AS (
+    SELECT MAX(E_PERIOD_DATE) AS FY_ACTPY_PERIOD
+    FROM T1NFRP_PHY."CV_UP_NFRP_ALLRATIOS"
+    WHERE M_ACCOUNT_5 LIKE ''CIR %'' AND T_REPORTING = ''FPNA''
+    AND   DATA_TYPE = ''Actuals'' AND T_VERSION = ''YTD'' AND MONTH_ABR = ''FY''
+),
+FY_OUTLOOK_ANCHOR AS (
+    SELECT MAX(E_PERIOD_DATE) AS FY_OUTLOOK_PERIOD
+    FROM T1NFRP_PHY."CV_UP_NFRP_ALLRATIOS"
+    WHERE M_ACCOUNT_5 LIKE ''CIR %'' AND E_BOOKS = ''NEWF - OL''
+    AND   T_REPORTING = ''FPNA'' AND DATA_TYPE = ''Outlook_PM'' AND T_VERSION = ''YTD''
+),
+PERIOD_SET AS (
+    SELECT P.CURRENT_YTD_PERIOD, P.PYYTD_PERIOD, P.PREV_QTR_PERIOD, P.PYPQTR_PERIOD,
+           FA.FY_ACTPY_PERIOD, OA.FY_OUTLOOK_PERIOD
+    FROM PERIODS P CROSS JOIN FY_ANCHOR FA CROSS JOIN FY_OUTLOOK_ANCHOR OA
+),
+ALL_MEASURES AS (
+    SELECT
+        SUM(CASE WHEN R.DATA_TYPE=''Actuals''    AND R.T_VERSION=''YTD'' AND R.E_PERIOD_DATE=PS.CURRENT_YTD_PERIOD THEN R.CFX_N ELSE 0 END) AS YTD_ACTUALS_CFX,
+        SUM(CASE WHEN R.DATA_TYPE=''Budget''     AND R.T_VERSION=''YTD'' AND R.E_PERIOD_DATE=PS.CURRENT_YTD_PERIOD THEN R.CFX_N ELSE 0 END) AS RBUDYTD_CFX,
+        SUM(CASE WHEN R.DATA_TYPE=''Actuals''    AND R.T_VERSION=''QTD'' AND R.E_PERIOD_DATE=PS.PREV_QTR_PERIOD    THEN R.CFX_N ELSE 0 END) AS PQTR_ACTUALS_CFX,
+        SUM(CASE WHEN R.DATA_TYPE=''Outlook_PM'' AND R.T_VERSION=''YTD'' AND R.E_BOOKS=''NEWF - OL'' AND R.E_PERIOD_DATE=PS.FY_OUTLOOK_PERIOD THEN R.CFX_N ELSE 0 END) AS FY_OUTLOOK_CFX,
+        SUM(CASE WHEN R.DATA_TYPE=''Actuals''    AND R.T_VERSION=''YTD'' AND R.MONTH_ABR=''FY'' AND R.E_PERIOD_DATE=PS.FY_ACTPY_PERIOD   THEN R.CFX_N ELSE 0 END) AS FY_ACTPY_CFX,
+        SUM(CASE WHEN R.DATA_TYPE=''Actuals''    AND R.T_VERSION=''YTD'' AND R.E_PERIOD_DATE=PS.PYYTD_PERIOD       THEN R.CFX_N ELSE 0 END) AS PYYTD_ACTUALS_CFX,
+        SUM(CASE WHEN R.DATA_TYPE=''Actuals''    AND R.T_VERSION=''QTD'' AND R.E_PERIOD_DATE=PS.PYPQTR_PERIOD      THEN R.CFX_N ELSE 0 END) AS PYPQTR_ACTUALS_CFX,
+        SUM(CASE WHEN R.DATA_TYPE=''Actuals''    AND R.T_VERSION=''YTD'' AND R.E_PERIOD_DATE=PS.CURRENT_YTD_PERIOD THEN R.RFX_N ELSE 0 END) AS YTD_ACTUALS_RFX,
+        SUM(CASE WHEN R.DATA_TYPE=''Budget''     AND R.T_VERSION=''YTD'' AND R.E_PERIOD_DATE=PS.CURRENT_YTD_PERIOD THEN R.RFX_N ELSE 0 END) AS RBUDYTD_RFX,
+        SUM(CASE WHEN R.DATA_TYPE=''Actuals''    AND R.T_VERSION=''QTD'' AND R.E_PERIOD_DATE=PS.PREV_QTR_PERIOD    THEN R.RFX_N ELSE 0 END) AS PQTR_ACTUALS_RFX,
+        SUM(CASE WHEN R.DATA_TYPE=''Outlook_PM'' AND R.T_VERSION=''YTD'' AND R.E_BOOKS=''NEWF - OL'' AND R.E_PERIOD_DATE=PS.FY_OUTLOOK_PERIOD THEN R.RFX_N ELSE 0 END) AS FY_OUTLOOK_RFX,
+        SUM(CASE WHEN R.DATA_TYPE=''Actuals''    AND R.T_VERSION=''YTD'' AND R.MONTH_ABR=''FY'' AND R.E_PERIOD_DATE=PS.FY_ACTPY_PERIOD   THEN R.RFX_N ELSE 0 END) AS FY_ACTPY_RFX,
+        SUM(CASE WHEN R.DATA_TYPE=''Actuals''    AND R.T_VERSION=''YTD'' AND R.E_PERIOD_DATE=PS.PYYTD_PERIOD       THEN R.RFX_N ELSE 0 END) AS PYYTD_ACTUALS_RFX,
+        SUM(CASE WHEN R.DATA_TYPE=''Actuals''    AND R.T_VERSION=''QTD'' AND R.E_PERIOD_DATE=PS.PYPQTR_PERIOD      THEN R.RFX_N ELSE 0 END) AS PYPQTR_ACTUALS_RFX
+    FROM T1NFRP_PHY."CV_UP_NFRP_ALLRATIOS" R CROSS JOIN PERIOD_SET PS
+    WHERE R.M_ACCOUNT_5 LIKE ''CIR %'' AND R.T_REPORTING = ''FPNA''
+    AND R.E_PERIOD_DATE IN (PS.CURRENT_YTD_PERIOD,PS.PYYTD_PERIOD,PS.PREV_QTR_PERIOD,PS.PYPQTR_PERIOD,PS.FY_ACTPY_PERIOD,PS.FY_OUTLOOK_PERIOD)
+)
+SELECT
+    M.YTD_ACTUALS_CFX,
+    (M.YTD_ACTUALS_CFX  - M.RBUDYTD_CFX)        AS VS_BUDGET_CFX,
+    M.PQTR_ACTUALS_CFX,
+    M.FY_OUTLOOK_CFX,
+    (M.FY_OUTLOOK_CFX   - M.FY_ACTPY_CFX)       AS VAR_FY_ACTPY_CFX,
+    (M.PQTR_ACTUALS_CFX - M.PYPQTR_ACTUALS_CFX) AS VAR_PYPQTR_CFX,
+    (M.YTD_ACTUALS_CFX  - M.PYYTD_ACTUALS_CFX)  AS VAR_PYYTD_CFX,
+    M.YTD_ACTUALS_RFX,
+    (M.YTD_ACTUALS_RFX  - M.RBUDYTD_RFX)        AS VS_BUDGET_RFX,
+    M.PQTR_ACTUALS_RFX,
+    M.FY_OUTLOOK_RFX,
+    (M.FY_OUTLOOK_RFX   - M.FY_ACTPY_RFX)       AS VAR_FY_ACTPY_RFX,
+    (M.PQTR_ACTUALS_RFX - M.PYPQTR_ACTUALS_RFX) AS VAR_PYPQTR_RFX,
+    (M.YTD_ACTUALS_RFX  - M.PYYTD_ACTUALS_RFX)  AS VAR_PYYTD_RFX
+FROM PERIOD_SET PS CROSS JOIN ALL_MEASURES M'
+);
 
-            function fmt(val) {
-                if (val === 0) return "0";
-                var abs  = Math.abs(val);
-                var sign = val < 0 ? "-" : "";
-                if (abs >= 1e9) return sign + (abs / 1e9).toFixed(3).replace(/\.?0+$/, "") + "B";
-                if (abs >= 1e6) return sign + (abs / 1e6).toFixed(3).replace(/\.?0+$/, "") + "M";
-                return sign + abs.toLocaleString();
-            }
+-- ── 11. Controllable Headcount ────────────────────────────
 
-            var aCategories = aData.map(function (d) { return d.product; });
-            var aFyOutlook  = aData.map(function (d) { return d.fyOutlook; });
-            var aYtd        = aData.map(function (d) { return d.ytd; });
-            var aFyBudget   = aData.map(function (d) { return d.fyBudget; });
+INSERT INTO "T1NFRP_NFRP_FINANCIALS_REPORTING_MASTER"
+("ID", "WIDGET", "QUERY")
+VALUES (
+11,
+'Controllable Headcount',
+'WITH DATA_ANCHOR AS (
+    SELECT MAX(A.E_PERIOD_DATE) AS ACTUALS_YTD_DATE
+    FROM T1NFRP_PHY."CV_UP_NFRP_ALLDATA" A
+    WHERE A.M_ACCOUNT_0 = ''Headcount''
+    AND   A.M_ACCOUNT_1 = ''Controllable FTE''
+    AND   A.T_REPORTING = ''FPNA''
+    AND   A.DATA_TYPE   = ''Actuals''
+    AND   A.T_VERSION   = ''YTD''
+    AND   A.CFX        != 0
+    AND EXISTS (
+        SELECT 1 FROM T1NFRP_PHY."TBL_NFRP_DATE_CONFIG" D
+        WHERE D.FILTER_DATE = TO_VARCHAR(A.E_PERIOD_DATE, ''YYYY-MM-DD'')
+    )
+),
+PERIODS AS (
+    SELECT
+        MAX(CASE WHEN D.ADD16 = ''0''                         THEN D.E_PERIOD_DATE END) AS CURRENT_YTD_PERIOD,
+        MAX(CASE WHEN D.ADD17 = ''-1'' AND D.ADD19 = ''CY''   THEN D.E_PERIOD_DATE END) AS CY_PQ_PERIOD,
+        MAX(CASE WHEN D.ADD17 = ''-5'' AND D.ADD19 = ''PY''   THEN D.E_PERIOD_DATE END) AS PY_PQ_PERIOD,
+        MAX(CASE WHEN D.ADD6  = ''PY_YTD''                    THEN D.E_PERIOD_DATE END) AS YTD_PY_PERIOD
+    FROM T1NFRP_PHY."TBL_NFRP_DATE_CONFIG" D
+    CROSS JOIN DATA_ANCHOR A
+    WHERE D.FILTER_DATE = TO_VARCHAR(A.ACTUALS_YTD_DATE, ''YYYY-MM-DD'')
+),
+FY_OUTLOOK_ANCHOR AS (
+    SELECT MAX(E_PERIOD_DATE) AS FY_OUTLOOK_PERIOD
+    FROM T1NFRP_PHY."CV_UP_NFRP_ALLDATA"
+    WHERE M_ACCOUNT_0 = ''Headcount'' AND M_ACCOUNT_1 = ''Controllable FTE''
+    AND   T_REPORTING = ''FPNA'' AND DATA_TYPE = ''Outlook_PM''
+    AND   T_VERSION = ''YTD'' AND MONTH_ABR = ''FY''
+),
+PERIOD_SET AS (
+    SELECT P.CURRENT_YTD_PERIOD, P.CY_PQ_PERIOD, P.PY_PQ_PERIOD,
+           P.YTD_PY_PERIOD, OA.FY_OUTLOOK_PERIOD
+    FROM PERIODS P CROSS JOIN FY_OUTLOOK_ANCHOR OA
+),
+ALL_MEASURES AS (
+    SELECT
+        SUM(CASE WHEN A.DATA_TYPE=''Actuals''    AND A.T_VERSION=''YTD'' AND A.E_PERIOD_DATE=PS.CURRENT_YTD_PERIOD THEN A.CFX ELSE 0 END) AS YTD_ACTUALS_CFX,
+        SUM(CASE WHEN A.DATA_TYPE=''Budget''     AND A.T_VERSION=''YTD'' AND A.E_PERIOD_DATE=PS.CURRENT_YTD_PERIOD THEN A.CFX ELSE 0 END) AS YTDB_CFX,
+        SUM(CASE WHEN A.DATA_TYPE=''Actuals''    AND A.T_VERSION=''QTD'' AND A.E_PERIOD_DATE=PS.CY_PQ_PERIOD       THEN A.CFX ELSE 0 END) AS CY_PQ_ACTUALS_CFX,
+        SUM(CASE WHEN A.DATA_TYPE=''Outlook_PM'' AND A.T_VERSION=''YTD'' AND A.MONTH_ABR=''FY'' AND A.E_PERIOD_DATE=PS.FY_OUTLOOK_PERIOD THEN A.CFX ELSE 0 END) AS FY_OUTLOOK_CFX,
+        SUM(CASE WHEN A.DATA_TYPE=''Actuals''    AND A.T_VERSION=''MTD'' AND A.E_PERIOD_DATE=PS.YTD_PY_PERIOD      THEN A.CFX ELSE 0 END) AS YTD_ACTUALS_PY_CFX,
+        SUM(CASE WHEN A.DATA_TYPE=''Actuals''    AND A.T_VERSION=''QTD'' AND A.E_PERIOD_DATE=PS.PY_PQ_PERIOD       THEN A.CFX ELSE 0 END) AS PY_PQ_ACTUALS_CFX,
+        SUM(CASE WHEN A.DATA_TYPE=''Actuals''    AND A.T_VERSION=''YTD'' AND A.E_PERIOD_DATE=PS.CURRENT_YTD_PERIOD THEN A.RFX ELSE 0 END) AS YTD_ACTUALS_RFX,
+        SUM(CASE WHEN A.DATA_TYPE=''Budget''     AND A.T_VERSION=''YTD'' AND A.E_PERIOD_DATE=PS.CURRENT_YTD_PERIOD THEN A.RFX ELSE 0 END) AS YTDB_RFX,
+        SUM(CASE WHEN A.DATA_TYPE=''Actuals''    AND A.T_VERSION=''QTD'' AND A.E_PERIOD_DATE=PS.CY_PQ_PERIOD       THEN A.RFX ELSE 0 END) AS CY_PQ_ACTUALS_RFX,
+        SUM(CASE WHEN A.DATA_TYPE=''Outlook_PM'' AND A.T_VERSION=''YTD'' AND A.MONTH_ABR=''FY'' AND A.E_PERIOD_DATE=PS.FY_OUTLOOK_PERIOD THEN A.RFX ELSE 0 END) AS FY_OUTLOOK_RFX,
+        SUM(CASE WHEN A.DATA_TYPE=''Actuals''    AND A.T_VERSION=''MTD'' AND A.E_PERIOD_DATE=PS.YTD_PY_PERIOD      THEN A.RFX ELSE 0 END) AS YTD_ACTUALS_PY_RFX,
+        SUM(CASE WHEN A.DATA_TYPE=''Actuals''    AND A.T_VERSION=''QTD'' AND A.E_PERIOD_DATE=PS.PY_PQ_PERIOD       THEN A.RFX ELSE 0 END) AS PY_PQ_ACTUALS_RFX
+    FROM T1NFRP_PHY."CV_UP_NFRP_ALLDATA" A CROSS JOIN PERIOD_SET PS
+    WHERE A.M_ACCOUNT_0 = ''Headcount'' AND A.M_ACCOUNT_1 = ''Controllable FTE''
+    AND   A.T_REPORTING = ''FPNA''
+    AND   A.E_PERIOD_DATE IN (PS.CURRENT_YTD_PERIOD,PS.CY_PQ_PERIOD,PS.PY_PQ_PERIOD,PS.YTD_PY_PERIOD,PS.FY_OUTLOOK_PERIOD)
+)
+SELECT
+    M.YTD_ACTUALS_CFX,
+    (M.YTD_ACTUALS_CFX   - M.YTDB_CFX)           AS VS_BUDGET_CFX,
+    M.CY_PQ_ACTUALS_CFX,
+    M.FY_OUTLOOK_CFX,
+    (M.CY_PQ_ACTUALS_CFX - M.PY_PQ_ACTUALS_CFX)  AS VAR_PY_PQ_YOY_CFX,
+    (M.YTD_ACTUALS_CFX   - M.YTD_ACTUALS_PY_CFX) AS VAR_YTD_PY_YOY_CFX,
+    (M.FY_OUTLOOK_CFX    - M.YTD_ACTUALS_PY_CFX) AS VAR_FY_VS_PY_CFX,
+    M.YTD_ACTUALS_RFX,
+    (M.YTD_ACTUALS_RFX   - M.YTDB_RFX)           AS VS_BUDGET_RFX,
+    M.CY_PQ_ACTUALS_RFX,
+    M.FY_OUTLOOK_RFX,
+    (M.CY_PQ_ACTUALS_RFX - M.PY_PQ_ACTUALS_RFX)  AS VAR_PY_PQ_YOY_RFX,
+    (M.YTD_ACTUALS_RFX   - M.YTD_ACTUALS_PY_RFX) AS VAR_YTD_PY_YOY_RFX,
+    (M.FY_OUTLOOK_RFX    - M.YTD_ACTUALS_PY_RFX) AS VAR_FY_VS_PY_RFX
+FROM PERIOD_SET PS CROSS JOIN ALL_MEASURES M'
+);
 
-            oChart.setOption({
-                backgroundColor: "#ffffff",
-                legend: {
-                    top: 0, right: 0,
-                    itemWidth: 12, itemHeight: 12,
-                    textStyle: { fontSize: 11, color: "#333" },
-                    data: [
-                        { name: "FY Outlook", icon: "rect" },
-                        { name: "YTD", icon: "rect" },
-                        { name: "FY Budget", icon: "rect" }
-                    ]
-                },
-                grid: { left: 60, right: 20, top: 40, bottom: 50 },
-                xAxis: {
-                    type: "category",
-                    data: aCategories,
-                    axisLine: { lineStyle: { color: "#ccc" } },
-                    axisTick: { show: false },
-                    axisLabel: { color: "#555", fontSize: 11 }
-                },
-                yAxis: {
-                    type: "value",
-                    axisLabel: {
-                        color: "#555", fontSize: 10,
-                        formatter: function (val) { return fmt(val); }
-                    },
-                    splitLine: { lineStyle: { color: "#f0f0f0" } },
-                    axisLine: { show: false }
-                },
-                tooltip: {
-                    trigger: "axis",
-                    formatter: function (params) {
-                        var str = params[0].axisValue + "<br/>";
-                        params.forEach(function (p) {
-                            str += p.marker + " " + p.seriesName +
-                                   ": " + fmt(p.value) + "<br/>";
-                        });
-                        return str;
-                    }
-                },
-                series: [
-                    {
-                        name: "FY Outlook", type: "bar",
-                        data: aFyOutlook, barWidth: 50, z: 1,
-                        itemStyle: { color: "#1565c0" },
-                        label: {
-                            show: true, position: "top",
-                            color: "#333", fontSize: 9,
-                            formatter: function (p) { return fmt(p.value); }
-                        }
-                    },
-                    {
-                        name: "YTD", type: "bar",
-                        data: aYtd, barWidth: 35,
-                        barGap: "-100%", z: 2,
-                        itemStyle: { color: "#1e88e5" },
-                        label: {
-                            show: true, position: "top",
-                            color: "#333", fontSize: 9,
-                            formatter: function (p) { return fmt(p.value); }
-                        }
-                    },
-                    {
-                        name: "FY Budget", type: "bar",
-                        data: aFyBudget, barWidth: 20,
-                        barGap: "-100%", z: 3,
-                        itemStyle: { color: "#90caf9" },
-                        label: { show: false }
-                    }
-                ]
-            });
+-- ── 12. Second RWA ────────────────────────────────────────
 
-            window.addEventListener("resize", function () { oChart.resize(); });
-        }
-    });
-});
+INSERT INTO "T1NFRP_NFRP_FINANCIALS_REPORTING_MASTER"
+("ID", "WIDGET", "QUERY")
+VALUES (
+12,
+'Second RWA',
+'WITH DATA_ANCHOR AS (
+    SELECT MAX(A.E_PERIOD_DATE) AS ACTUALS_YTD_DATE
+    FROM T1NFRP_PHY."CV_UP_NFRP_ALLDATA" A
+    WHERE A.M_ACCOUNT_0 = ''Risk Weighted Assets''
+    AND   A.T_REPORTING = ''FPNA''
+    AND   A.DATA_TYPE   = ''Actuals''
+    AND   A.T_VERSION   = ''YTD''
+    AND   A.CFX        != 0
+    AND EXISTS (
+        SELECT 1 FROM T1NFRP_PHY."TBL_NFRP_DATE_CONFIG" D
+        WHERE D.FILTER_DATE = TO_VARCHAR(A.E_PERIOD_DATE, ''YYYY-MM-DD'')
+    )
+),
+PERIODS AS (
+    SELECT
+        MAX(CASE WHEN D.ADD16 = ''0''                         THEN D.E_PERIOD_DATE END) AS CURRENT_YTD_PERIOD,
+        MAX(CASE WHEN D.ADD17 = ''-1'' AND D.ADD19 = ''CY''   THEN D.E_PERIOD_DATE END) AS CY_PQ_PERIOD,
+        MAX(CASE WHEN D.ADD17 = ''-5'' AND D.ADD19 = ''PY''   THEN D.E_PERIOD_DATE END) AS PY_PQ_PERIOD,
+        MAX(CASE WHEN D.ADD6  = ''PY_YTD''                    THEN D.E_PERIOD_DATE END) AS YTD_PY_PERIOD
+    FROM T1NFRP_PHY."TBL_NFRP_DATE_CONFIG" D
+    CROSS JOIN DATA_ANCHOR A
+    WHERE D.FILTER_DATE = TO_VARCHAR(A.ACTUALS_YTD_DATE, ''YYYY-MM-DD'')
+),
+FY_OUTLOOK_ANCHOR AS (
+    SELECT MAX(E_PERIOD_DATE) AS FY_OUTLOOK_PERIOD
+    FROM T1NFRP_PHY."CV_UP_NFRP_ALLDATA"
+    WHERE M_ACCOUNT_0 = ''Risk Weighted Assets''
+    AND   T_REPORTING = ''FPNA'' AND DATA_TYPE = ''Outlook_PM''
+    AND   T_VERSION = ''YTD'' AND MONTH_ABR = ''FY''
+),
+PERIOD_SET AS (
+    SELECT P.CURRENT_YTD_PERIOD, P.CY_PQ_PERIOD, P.PY_PQ_PERIOD,
+           P.YTD_PY_PERIOD, OA.FY_OUTLOOK_PERIOD
+    FROM PERIODS P CROSS JOIN FY_OUTLOOK_ANCHOR OA
+),
+ALL_MEASURES AS (
+    SELECT
+        SUM(CASE WHEN A.DATA_TYPE=''Actuals''    AND A.T_VERSION=''YTD'' AND A.E_PERIOD_DATE=PS.CURRENT_YTD_PERIOD THEN A.CFX ELSE 0 END) AS YTD_ACTUALS_CFX,
+        SUM(CASE WHEN A.DATA_TYPE=''Budget''     AND A.T_VERSION=''YTD'' AND A.E_PERIOD_DATE=PS.CURRENT_YTD_PERIOD THEN A.CFX ELSE 0 END) AS YTDB_CFX,
+        SUM(CASE WHEN A.DATA_TYPE=''Actuals''    AND A.T_VERSION=''QTD'' AND A.E_PERIOD_DATE=PS.CY_PQ_PERIOD       THEN A.CFX ELSE 0 END) AS CY_PQ_ACTUALS_CFX,
+        SUM(CASE WHEN A.DATA_TYPE=''Outlook_PM'' AND A.T_VERSION=''YTD'' AND A.MONTH_ABR=''FY'' AND A.E_PERIOD_DATE=PS.FY_OUTLOOK_PERIOD THEN A.CFX ELSE 0 END) AS FY_OUTLOOK_CFX,
+        SUM(CASE WHEN A.DATA_TYPE=''Actuals''    AND A.T_VERSION=''MTD'' AND A.E_PERIOD_DATE=PS.YTD_PY_PERIOD      THEN A.CFX ELSE 0 END) AS YTD_ACTUALS_PY_CFX,
+        SUM(CASE WHEN A.DATA_TYPE=''Actuals''    AND A.T_VERSION=''QTD'' AND A.E_PERIOD_DATE=PS.PY_PQ_PERIOD       THEN A.CFX ELSE 0 END) AS PY_PQ_ACTUALS_CFX,
+        SUM(CASE WHEN A.DATA_TYPE=''Actuals''    AND A.T_VERSION=''YTD'' AND A.E_PERIOD_DATE=PS.CURRENT_YTD_PERIOD THEN A.RFX ELSE 0 END) AS YTD_ACTUALS_RFX,
+        SUM(CASE WHEN A.DATA_TYPE=''Budget''     AND A.T_VERSION=''YTD'' AND A.E_PERIOD_DATE=PS.CURRENT_YTD_PERIOD THEN A.RFX ELSE 0 END) AS YTDB_RFX,
+        SUM(CASE WHEN A.DATA_TYPE=''Actuals''    AND A.T_VERSION=''QTD'' AND A.E_PERIOD_DATE=PS.CY_PQ_PERIOD       THEN A.RFX ELSE 0 END) AS CY_PQ_ACTUALS_RFX,
+        SUM(CASE WHEN A.DATA_TYPE=''Outlook_PM'' AND A.T_VERSION=''YTD'' AND A.MONTH_ABR=''FY'' AND A.E_PERIOD_DATE=PS.FY_OUTLOOK_PERIOD THEN A.RFX ELSE 0 END) AS FY_OUTLOOK_RFX,
+        SUM(CASE WHEN A.DATA_TYPE=''Actuals''    AND A.T_VERSION=''MTD'' AND A.E_PERIOD_DATE=PS.YTD_PY_PERIOD      THEN A.RFX ELSE 0 END) AS YTD_ACTUALS_PY_RFX,
+        SUM(CASE WHEN A.DATA_TYPE=''Actuals''    AND A.T_VERSION=''QTD'' AND A.E_PERIOD_DATE=PS.PY_PQ_PERIOD       THEN A.RFX ELSE 0 END) AS PY_PQ_ACTUALS_RFX
+    FROM T1NFRP_PHY."CV_UP_NFRP_ALLDATA" A CROSS JOIN PERIOD_SET PS
+    WHERE A.M_ACCOUNT_0 = ''Risk Weighted Assets'' AND A.T_REPORTING = ''FPNA''
+    AND   A.E_PERIOD_DATE IN (PS.CURRENT_YTD_PERIOD,PS.CY_PQ_PERIOD,PS.PY_PQ_PERIOD,PS.YTD_PY_PERIOD,PS.FY_OUTLOOK_PERIOD)
+)
+SELECT
+    M.YTD_ACTUALS_CFX,
+    (M.YTD_ACTUALS_CFX   - M.YTDB_CFX)           AS VS_BUDGET_CFX,
+    M.CY_PQ_ACTUALS_CFX,
+    M.FY_OUTLOOK_CFX,
+    (M.CY_PQ_ACTUALS_CFX - M.PY_PQ_ACTUALS_CFX)  AS VAR_PY_PQ_YOY_CFX,
+    (M.YTD_ACTUALS_CFX   - M.YTD_ACTUALS_PY_CFX) AS VAR_YTD_PY_YOY_CFX,
+    (M.FY_OUTLOOK_CFX    - M.YTD_ACTUALS_PY_CFX) AS VAR_FY_VS_PY_CFX,
+    M.YTD_ACTUALS_RFX,
+    (M.YTD_ACTUALS_RFX   - M.YTDB_RFX)           AS VS_BUDGET_RFX,
+    M.CY_PQ_ACTUALS_RFX,
+    M.FY_OUTLOOK_RFX,
+    (M.CY_PQ_ACTUALS_RFX - M.PY_PQ_ACTUALS_RFX)  AS VAR_PY_PQ_YOY_RFX,
+    (M.YTD_ACTUALS_RFX   - M.YTD_ACTUALS_PY_RFX) AS VAR_YTD_PY_YOY_RFX,
+    (M.FY_OUTLOOK_RFX    - M.YTD_ACTUALS_PY_RFX) AS VAR_FY_VS_PY_RFX
+FROM PERIOD_SET PS CROSS JOIN ALL_MEASURES M'
+);
+
+
+-- ── Verify all 12 rows inserted correctly ─────────────────
+
+SELECT "ID", "WIDGET", LENGTH("QUERY") AS QUERY_LEN
+FROM "T1NFRP_NFRP_FINANCIALS_REPORTING_MASTER"
+ORDER BY "ID";
