@@ -1,3 +1,150 @@
+// Matches the path in your Service.cds and setupProxy.js
+const API_BASE_URL = '/api/nrfp';
+
+/**
+ * 1. Fetch the list of widget names to build the KPI grid
+ */
+export async function getWidgetNames(filters) {
+  // CAP actions require a POST request
+  const response = await fetch(`${API_BASE_URL}/getWidgetNames`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({}) 
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to fetch widget names');
+  }
+
+  const result = await response.json();
+  
+  // OData actions typically return the result inside a 'value' property
+  return result.value || result;
+}
+
+/**
+ * 2. Fetch specific KPI data and format it for the KpiCard
+ */
+export async function getWidgetDataSingle(name, filters) {
+  // Build the payload matching the input parameters of your CAP action
+  const payload = {
+    widgetName: name,
+    topGroup: filters.group,         // 'Group', 'CIB', 'WRB'
+    displayUnit: filters.unit,       // '$m', '$bn'
+    currencyType: filters.currency   // 'RFX', 'CFX'
+  };
+
+  const response = await fetch(`${API_BASE_URL}/getWidgetDataSingle`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  });
+
+  if (!response.ok) {
+    throw new Error(`Failed to fetch data for ${name}`);
+  }
+
+  const result = await response.json();
+  
+  // CAP wraps the action return object in a 'value' property
+  const actionData = result.value || result;
+
+  // Handle errors sent gracefully by the CAP backend
+  if (actionData.status && actionData.status.startsWith('error')) {
+    throw new Error(actionData.status);
+  }
+
+  // Your CAP backend stringifies the data payload using JSON.stringify() in buildJson
+  // We must parse it back into a usable JavaScript object here
+  let parsedData = {};
+  try {
+    parsedData = JSON.parse(actionData.data);
+  } catch (e) {
+    console.error(`Failed to parse JSON for widget ${name}`, e);
+  }
+
+  // Pick the correct dataset based on the active currency toggle (RFX or CFX)
+  const isCFX = filters.currency === 'CFX';
+  const dataSet = isCFX ? parsedData.cfx : parsedData.rfx;
+
+  // Fallback if data doesn't exist for a widget yet or backend returned an error structure
+  if (!dataSet) {
+    return {
+      name: parsedData.widget || name,
+      value: 0, 
+      yoy: null,
+      label: 'YTD Actuals', 
+      subRows: []
+    };
+  }
+
+  // Transform the backend model into the exact UI model expected by KpiCard.js
+  return {
+    name: parsedData.widget || name,
+    value: dataSet.ytdActuals,
+    yoy: dataSet.ytdYoy,
+    label: 'YTD Actuals',
+    subRows: [
+      { 
+        label: 'vs Budget', 
+        value: dataSet.vsBudget, 
+        yoy: null // Fiori design doesn't show YoY for 'vs Budget'
+      },
+      { 
+        label: 'PQ Actuals', 
+        value: dataSet.pqActuals, 
+        yoy: dataSet.pqYoy 
+      },
+      { 
+        label: 'FY Outlook', 
+        value: dataSet.fyOutlook, 
+        yoy: dataSet.fyYoy 
+      }
+    ]
+  };
+}
+
+/**
+ * 3. Placeholder for Chart Data
+ * Update this later to point to your actual CAP backend endpoint for charts
+ */
+export async function getIncomeByProduct(filters) {
+  // Mock data to prevent app from crashing while you build the backend
+  return {
+    categories: ['Banking', 'Markets', 'Transaction services'],
+    series: [
+      { name: 'FY Outlook', color: '#1565C0', data: [2.8, 4.0, 10.8] },
+      { name: 'YTD', color: '#1E88E5', data: [2.1, -3.2, 10.1] },
+      { name: 'FY Budget', color: '#90CAF9', data: [2.5, 3.5, 10.5] }
+    ]
+  };
+}
+
+/**
+ * 4. Placeholder for Table Data
+ * Update this later to point to your actual CAP backend endpoint for tables
+ */
+export async function getIncomeByCluster(filters) {
+  // Mock data to prevent app from crashing while you build the backend
+  return [
+    { 
+      id: 'all', 
+      level: 0, 
+      label: '(all)', 
+      ytd: 9009164724.23, 
+      yoyPct: 1.46, 
+      q3Outlook: 2713863131.93, 
+      fyOutlook: 9175025425.30 
+    }
+  ];
+}
+
+
+
+
+
+
+
 import React, { useState } from 'react';
 import {
   Box, Grid, Typography,
